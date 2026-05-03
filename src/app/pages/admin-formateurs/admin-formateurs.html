@@ -1,0 +1,233 @@
+<div class="dash">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="white" stroke-width="1.8"/>
+          <path d="M4 20C4 17 7.58 14 12 14C16.42 14 20 17 20 20" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M16 3.5C17.5 4.5 18.5 6.1 18.5 8C18.5 9.9 17.5 11.5 16 12.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Formateurs</h1>
+        <p class="topbar-sub">Gérez les candidatures et les comptes formateurs</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent:#6366f1;--accent-light:#eef2ff">
+      <div class="stat-icon">👨‍🏫</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ tousFormateurs.length }}</div>
+        <div class="stat-label">Total formateurs</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#f59e0b;--accent-light:#fef3c7">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ candidatures.length }}</div>
+        <div class="stat-label">En attente</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#10b981;--accent-light:#d1fae5">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ activeCount }}</div>
+        <div class="stat-label">Actifs</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#ef4444;--accent-light:#fee2e2">
+      <div class="stat-icon">🚫</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ bloqueCount }}</div>
+        <div class="stat-label">Bloqués</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONGLETS -->
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab" [class.active]="onglet === 'attente'" (click)="onglet = 'attente'">
+        ⏳ Candidatures
+        <span class="tab-badge" *ngIf="candidatures.length > 0">{{ candidatures.length }}</span>
+      </button>
+      <button class="tab" [class.active]="onglet === 'tous'" (click)="onglet = 'tous'; searchQuery = ''">
+        👨‍🏫 Tous les formateurs
+        <span class="tab-badge neutral">{{ tousFormateurs.length }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="state-box"><div class="spinner"></div><span>Chargement…</span></div>
+  <div *ngIf="!loading && errorMessage" class="state-box error-box"><span>⚠️ {{ errorMessage }}</span></div>
+
+  <!-- ══ ONGLET CANDIDATURES ══ -->
+  <ng-container *ngIf="onglet === 'attente'">
+    <div *ngIf="!loading && candidatures.length === 0" class="empty-state">
+      <div class="empty-emoji">🎉</div>
+      <h3>Aucune candidature en attente</h3>
+      <p>Toutes les candidatures ont été traitées.</p>
+    </div>
+
+    <div *ngIf="!loading && candidatures.length > 0" class="candidatures-grid">
+      <div *ngFor="let f of candidatures; let i = index"
+           class="candidat-card" [style.--delay]="i * 70 + 'ms'">
+
+        <div class="candidat-header">
+          <div class="candidat-avatar">{{ getInitiales(f.nom) }}</div>
+          <div class="candidat-info">
+            <h3>{{ f.nom }}</h3>
+            <p>{{ f.email }}</p>
+          </div>
+          <span class="status-badge">⏳ En attente</span>
+        </div>
+
+        <div class="candidat-details">
+          <div class="detail-row" *ngIf="f.specialite">
+            <span class="detail-icon">🎯</span>
+            <div><span class="detail-label">Spécialité</span><span class="detail-val">{{ f.specialite }}</span></div>
+          </div>
+          <div class="detail-row" *ngIf="f.portfolio">
+            <span class="detail-icon">🌐</span>
+            <div><span class="detail-label">Portfolio</span><span class="detail-val">{{ f.portfolio }}</span></div>
+          </div>
+          <div class="detail-row" *ngIf="f.bio">
+            <span class="detail-icon">📝</span>
+            <div><span class="detail-label">Bio</span><span class="detail-val">{{ f.bio }}</span></div>
+          </div>
+          <div class="detail-row" *ngIf="f.motivation">
+            <span class="detail-icon">💡</span>
+            <div><span class="detail-label">Motivation</span><span class="detail-val">{{ f.motivation }}</span></div>
+          </div>
+        </div>
+
+        <div class="documents" *ngIf="f.cvUrl || f.diplomeUrl || f.certificatUrl || f.attestationUrl">
+          <div class="docs-label">📎 Documents joints</div>
+          <div class="docs-links">
+            <a *ngIf="f.cvUrl"          [href]="getFileUrl(f.cvUrl)"          target="_blank" class="doc-link">📄 CV</a>
+            <a *ngIf="f.diplomeUrl"     [href]="getFileUrl(f.diplomeUrl)"     target="_blank" class="doc-link">📄 Diplôme</a>
+            <a *ngIf="f.certificatUrl"  [href]="getFileUrl(f.certificatUrl)"  target="_blank" class="doc-link">📄 Certificat</a>
+            <a *ngIf="f.attestationUrl" [href]="getFileUrl(f.attestationUrl)" target="_blank" class="doc-link">📄 Attestation</a>
+          </div>
+        </div>
+
+        <div class="candidat-actions">
+          <button class="btn-bloquer" (click)="ouvrirBloquer(f)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            Bloquer
+          </button>
+          <button class="btn-refuser" (click)="refuser(f.id)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            Refuser
+          </button>
+          <button class="btn-accepter" (click)="accepter(f.id)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            Accepter
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══ ONGLET TOUS LES FORMATEURS ══ -->
+  <ng-container *ngIf="onglet === 'tous'">
+
+    <!-- Recherche -->
+    <div class="search-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="text" class="search-input" [(ngModel)]="searchQuery"
+          placeholder="Rechercher un formateur…"/>
+        <button *ngIf="searchQuery" class="search-clear" (click)="searchQuery = ''">✕</button>
+      </div>
+    </div>
+
+    <div *ngIf="filteredTous().length === 0" class="empty-state">
+      <div class="empty-emoji">🔍</div>
+      <h3>Aucun formateur trouvé</h3>
+    </div>
+
+    <div class="formateurs-list" *ngIf="filteredTous().length > 0">
+      <div *ngFor="let f of filteredTous(); let i = index"
+           class="formateur-row" [style.--delay]="i * 50 + 'ms'">
+
+        <div class="formateur-avatar">{{ getInitiales(f.nom) }}</div>
+        <div class="formateur-info">
+          <div class="formateur-nom">{{ f.nom }}</div>
+          <div class="formateur-email">{{ f.email }}</div>
+          <div class="formateur-spec" *ngIf="f.specialite">🎯 {{ f.specialite }}</div>
+        </div>
+        <span class="statut-pill" [ngClass]="getStatusClass(f.status)">
+          {{ getStatusLabel(f.status) }}
+        </span>
+        <div class="formateur-actions">
+          <button *ngIf="!estBloque(f)" class="btn-bloquer-sm" (click)="ouvrirBloquer(f)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            Bloquer
+          </button>
+          <button *ngIf="estBloque(f)" class="btn-debloquer-sm" (click)="ouvrirDebloquer(f)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M7 11V7a5 5 0 0110 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            Débloquer
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══ MODAL BLOQUER ══ -->
+  <div *ngIf="showConfirmBloquer" class="overlay" (click)="fermerBloquer()">
+    <div class="modal modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon-big">🔒</div>
+      <h3>Bloquer ce formateur ?</h3>
+      <p><strong>{{ confirmBloquerTarget?.nom }}</strong> ne pourra plus accéder à la plateforme.</p>
+      <div class="modal-warn">⚠️ Accès bloqué immédiatement</div>
+      <div class="confirm-footer">
+        <button class="cf-cancel" (click)="fermerBloquer()">Annuler</button>
+        <button class="cf-delete" (click)="executerBloquer()" [disabled]="confirmBloquerLoading">
+          <span class="btn-spinner" *ngIf="confirmBloquerLoading"></span>
+          {{ confirmBloquerLoading ? 'En cours…' : '🔒 Bloquer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL DÉBLOQUER ══ -->
+  <div *ngIf="showConfirmDebloquer" class="overlay" (click)="fermerDebloquer()">
+    <div class="modal modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon-big">🔓</div>
+      <h3>Débloquer ce formateur ?</h3>
+      <p><strong>{{ confirmDebloquerTarget?.nom }}</strong> pourra de nouveau accéder à la plateforme.</p>
+      <div class="modal-note">✦ Statut → ACTIF</div>
+      <div class="confirm-footer">
+        <button class="cf-cancel" (click)="fermerDebloquer()">Annuler</button>
+        <button class="cf-debloquer" (click)="executerDebloquer()" [disabled]="confirmDebloquerLoading">
+          <span class="btn-spinner" *ngIf="confirmDebloquerLoading"></span>
+          {{ confirmDebloquerLoading ? 'En cours…' : '🔓 Débloquer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

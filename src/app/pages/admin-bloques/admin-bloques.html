@@ -1,0 +1,150 @@
+<div class="dash">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.8"/>
+          <path d="M4.93 4.93l14.14 14.14" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Utilisateurs bloqués</h1>
+        <p class="topbar-sub">Gérez les comptes bloqués sur la plateforme</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent:#ef4444;--accent-light:#fee2e2">
+      <div class="stat-icon">👨‍🎓</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ etudiantsBloques.length }}</div>
+        <div class="stat-label">Étudiants bloqués</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#f59e0b;--accent-light:#fef3c7">
+      <div class="stat-icon">👨‍🏫</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ formateursBloques.length }}</div>
+        <div class="stat-label">Formateurs bloqués</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#6366f1;--accent-light:#eef2ff">
+      <div class="stat-icon">🚫</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ etudiantsBloques.length + formateursBloques.length }}</div>
+        <div class="stat-label">Total bloqués</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONGLETS -->
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab" [class.active]="onglet === 'etudiants'" (click)="onglet = 'etudiants'; searchQuery = ''">
+        👨‍🎓 Étudiants
+        <span class="tab-badge" *ngIf="etudiantsBloques.length > 0">{{ etudiantsBloques.length }}</span>
+      </button>
+      <button class="tab" [class.active]="onglet === 'formateurs'" (click)="onglet = 'formateurs'; searchQuery = ''">
+        👨‍🏫 Formateurs
+        <span class="tab-badge" *ngIf="formateursBloques.length > 0">{{ formateursBloques.length }}</span>
+      </button>
+    </div>
+
+    <!-- Recherche -->
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+        <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" [(ngModel)]="searchQuery"
+        [placeholder]="'Rechercher un ' + (onglet === 'etudiants' ? 'étudiant' : 'formateur') + '…'"/>
+      <button *ngIf="searchQuery" class="search-clear" (click)="searchQuery = ''">✕</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="state-box">
+    <div class="spinner"></div><span>Chargement…</span>
+  </div>
+
+  <!-- ══ ÉTUDIANTS ══ -->
+  <ng-container *ngIf="!loading && onglet === 'etudiants'">
+    <div *ngIf="filteredEtudiants().length === 0" class="empty-state">
+      <div class="empty-emoji">✅</div>
+      <h3>Aucun étudiant bloqué</h3>
+      <p>Tous les étudiants sont actifs sur la plateforme.</p>
+    </div>
+
+    <div class="users-list" *ngIf="filteredEtudiants().length > 0">
+      <div *ngFor="let u of filteredEtudiants(); let i = index"
+           class="user-card" [style.--delay]="i * 55 + 'ms'">
+        <div class="user-avatar">{{ getInitiales(u.nom) }}</div>
+        <div class="user-info">
+          <div class="user-nom">{{ u.nom }}</div>
+          <div class="user-email">{{ u.email }}</div>
+        </div>
+        <span class="badge-bloque">🚫 Bloqué</span>
+        <button class="btn-debloquer" (click)="ouvrirConfirm(u)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M7 11V7a5 5 0 0110 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Débloquer
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══ FORMATEURS ══ -->
+  <ng-container *ngIf="!loading && onglet === 'formateurs'">
+    <div *ngIf="filteredFormateurs().length === 0" class="empty-state">
+      <div class="empty-emoji">✅</div>
+      <h3>Aucun formateur bloqué</h3>
+      <p>Tous les formateurs sont actifs sur la plateforme.</p>
+    </div>
+
+    <div class="users-list" *ngIf="filteredFormateurs().length > 0">
+      <div *ngFor="let u of filteredFormateurs(); let i = index"
+           class="user-card" [style.--delay]="i * 55 + 'ms'">
+        <div class="user-avatar formateur">{{ getInitiales(u.nom) }}</div>
+        <div class="user-info">
+          <div class="user-nom">{{ u.nom }}</div>
+          <div class="user-email">{{ u.email }}</div>
+        </div>
+        <span class="badge-bloque">🚫 Bloqué</span>
+        <button class="btn-debloquer" (click)="ouvrirConfirm(u)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M7 11V7a5 5 0 0110 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Débloquer
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══ MODAL CONFIRMATION ══ -->
+  <div *ngIf="showConfirm" class="overlay" (click)="fermerConfirm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-icon">🔓</div>
+      <h3>Débloquer cet utilisateur ?</h3>
+      <p>
+        <strong>{{ confirmTarget?.nom }}</strong> pourra de nouveau
+        accéder à la plateforme normalement.
+      </p>
+      <div class="modal-note">✦ Statut → ACTIF</div>
+      <div class="confirm-footer">
+        <button class="cf-cancel" (click)="fermerConfirm()">Annuler</button>
+        <button class="cf-confirm cf-debloquer" (click)="executer()" [disabled]="confirmLoading">
+          <span class="btn-spinner" *ngIf="confirmLoading"></span>
+          {{ confirmLoading ? 'En cours…' : '🔓 Débloquer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

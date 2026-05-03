@@ -1,0 +1,215 @@
+<!-- ══════════════════════════════════════════════════
+     MODAL PRINCIPALE — LISTE DES SOUS-CATÉGORIES
+══════════════════════════════════════════════════ -->
+<div class="overlay" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M3 6H21M3 12H21M3 18H15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="modal-title-text">
+          <h3>
+            Sous-catégories
+            <span class="cat-chip">{{ category?.nom }}</span>
+          </h3>
+          <p>Gérez les sous-catégories de cette catégorie</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+
+      <!-- CHARGEMENT -->
+      <div *ngIf="loading" class="state-box">
+        <div class="spinner"></div>
+        <span>Chargement des sous-catégories…</span>
+      </div>
+
+      <!-- ERREUR -->
+      <div *ngIf="!loading && errorMessage" class="state-box error-box">
+        <span>⚠️ {{ errorMessage }}</span>
+      </div>
+
+      <!-- CONTENU PRINCIPAL -->
+      <ng-container *ngIf="!loading && !errorMessage">
+
+        <!-- BOUTON AJOUTER -->
+        <button class="btn-add-sous" (click)="openSousCategoryForm()">
+          <span class="plus-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          Ajouter une sous-catégorie
+        </button>
+
+        <!-- MINI STATS -->
+        <div class="mini-stats" *ngIf="sousCategories.length > 0">
+          <div class="mini-stat">
+            <div class="mini-stat-val">{{ sousCategories.length }}</div>
+            <div class="mini-stat-label">Total</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val cyan">{{ withDescCount }}</div>
+            <div class="mini-stat-label">Avec desc.</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val orange">{{ withoutDescCount }}</div>
+            <div class="mini-stat-label">Sans desc.</div>
+          </div>
+        </div>
+
+        <!-- ÉTAT VIDE -->
+        <div *ngIf="sousCategories.length === 0" class="empty-state">
+          <div class="empty-emoji">📂</div>
+          <h4>Aucune sous-catégorie</h4>
+          <p>Commencez par créer la première sous-catégorie de <strong>{{ category?.nom }}</strong></p>
+        </div>
+
+        <!-- LISTE -->
+        <div class="sous-list" *ngIf="sousCategories.length > 0">
+          <div
+            *ngFor="let sousCat of sousCategories; let i = index"
+            class="sous-item"
+            [attr.data-index]="i">
+
+            <div class="sous-info">
+              <div class="sous-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 6H21M3 12H21M3 18H15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="sous-details">
+                <h4>{{ sousCat.nom }}</h4>
+                <p [class.no-desc]="!sousCat.description">
+                  {{ sousCat.description || 'Aucune description renseignée' }}
+                </p>
+                <span class="sous-id">ID · {{ sousCat.id }}</span>
+              </div>
+            </div>
+
+            <button
+              class="btn-del-sous"
+              (click)="confirmDeleteSousCategory(sousCat)"
+              title="Supprimer cette sous-catégorie">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <path d="M4 7H20M10 11V16M14 11V16M5 7L6 19a2 2 0 002 2h8a2 2 0 002-2L19 7M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"
+                  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+          </div>
+        </div>
+
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     MODAL — FORMULAIRE AJOUT SOUS-CATÉGORIE
+══════════════════════════════════════════════════ -->
+<div *ngIf="showSousCategoryForm" class="overlay" (click)="closeSousCategoryForm()">
+  <div class="modal modal-form" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon-wrap icon-green">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="modal-title-text">
+          <h3>Ajouter une sous-catégorie</h3>
+          <p>Rattachée à <strong>{{ category?.nom }}</strong></p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeSousCategoryForm()">✕</button>
+    </div>
+
+    <div class="form-body">
+      <div class="field">
+        <label>Nom de la sous-catégorie</label>
+        <input
+          type="text"
+          [(ngModel)]="nomSousCategorie"
+          placeholder="Ex: Frontend, Backend, Mobile…"
+          autofocus />
+      </div>
+      <div class="field">
+        <label>
+          Description
+          <span class="optional">(optionnelle)</span>
+        </label>
+        <textarea
+          [(ngModel)]="descriptionSousCategorie"
+          placeholder="Décrivez brièvement cette sous-catégorie…"
+          rows="4">
+        </textarea>
+      </div>
+
+      <!-- ERREUR INLINE -->
+      <div *ngIf="errorMessage" class="inline-error">
+        ⚠️ {{ errorMessage }}
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeSousCategoryForm()">Annuler</button>
+      <button class="btn-submit" (click)="addSousCategory()" [disabled]="loading">
+        <svg *ngIf="!loading" width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="btn-spinner" *ngIf="loading"></span>
+        {{ loading ? 'Ajout…' : 'Ajouter' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     MODAL — CONFIRMATION SUPPRESSION
+══════════════════════════════════════════════════ -->
+<div *ngIf="showDeleteSousConfirm" class="overlay" (click)="closeDeleteSousConfirm()">
+  <div class="modal modal-confirm" (click)="$event.stopPropagation()">
+
+    <div class="delete-icon-wrap">🗑️</div>
+
+    <h3>Supprimer la sous-catégorie ?</h3>
+
+    <p>
+      Vous allez supprimer
+      <strong>{{ sousCategoryToDelete?.nom }}</strong>.
+      Toutes les formations associées perdront cette classification.
+    </p>
+
+    <div>
+      <span class="irreversible">⚠️ Action irréversible</span>
+    </div>
+
+    <div class="confirm-footer">
+      <button class="btn-confirm-cancel" (click)="closeDeleteSousConfirm()">
+        Annuler
+      </button>
+      <button class="btn-confirm-del" (click)="deleteSousCategory()" [disabled]="loading">
+        <svg *ngIf="!loading" width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M4 7H20M5 7L6 19a2 2 0 002 2h8a2 2 0 002-2L19 7M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"
+            stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="btn-spinner btn-spinner-sm" *ngIf="loading"></span>
+        {{ loading ? 'Suppression…' : 'Oui, supprimer' }}
+      </button>
+    </div>
+
+  </div>
+</div>

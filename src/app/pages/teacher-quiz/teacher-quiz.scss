@@ -1,0 +1,329 @@
+
+$primary:   #6366f1;
+$primary-2: #8b5cf6;
+$primary-3: #06b6d4;
+$success:   #10b981;
+$warning:   #f59e0b;
+$danger:    #ef4444;
+$bg:        #f8f7ff;
+$surface:   #ffffff;
+$text:      #1e1b4b;
+$muted:     #64748b;
+$border:    #e8e6ff;
+$border-2:  #c7d2fe;
+
+.quiz-page {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 32px 36px;
+  background: $bg;
+  min-height: 100vh;
+}
+
+// ── Header ────────────────────────────────────────────
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
+  h1 { font-size: 22px; font-weight: 900; color: $text; margin: 0 0 4px; }
+}
+.page-sub { font-size: 13px; color: $muted; margin: 0; }
+
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 13px;
+}
+.btn-back {
+  display: flex; align-items: center; gap: 6px;
+  background: $surface; border: 1.5px solid $border; border-radius: 9px;
+  padding: 7px 14px; font-size: 13px; font-weight: 700; color: $muted;
+  cursor: pointer; font-family: inherit; transition: all .2s;
+  &:hover { border-color: $border-2; color: $primary; background: #eef2ff; }
+}
+.btn-bc {
+  background: none; border: none; color: $primary; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: inherit; padding: 0;
+  &:hover { text-decoration: underline; }
+}
+.bc-current { font-size: 13px; font-weight: 700; color: $text; }
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+.total-points {
+  background: #eef2ff; border: 1.5px solid $border-2; color: $primary;
+  padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700;
+}
+
+.btn-primary {
+  display: flex; align-items: center; gap: 7px;
+  background: linear-gradient(135deg, $primary, $primary-2);
+  color: white; border: none; border-radius: 12px;
+  padding: 11px 20px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 14px rgba(99,102,241,.3);
+  transition: transform .2s, box-shadow .2s;
+  &:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(99,102,241,.45); }
+}
+
+// ── Cours grid ────────────────────────────────────────
+.cours-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px;
+}
+.cours-card {
+  background: $surface; border: 1.5px solid $border; border-radius: 18px;
+  overflow: hidden; cursor: pointer;
+  animation: fadeUp .4s ease both; animation-delay: var(--delay, 0ms);
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  &:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(99,102,241,.15); border-color: $border-2; }
+}
+.card-banner {
+  height: 100px; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.card-img   { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.card-emoji { font-size: 36px; position: relative; z-index: 1; }
+.card-body  { padding: 14px 16px; h3 { font-size: 14px; font-weight: 800; color: $text; margin: 0 0 4px; } p { font-size: 12px; color: $muted; margin: 0 0 10px; } }
+.card-arrow { font-size: 12.5px; font-weight: 700; color: $primary; }
+
+// ── Leçons list ───────────────────────────────────────
+.lecons-list { display: flex; flex-direction: column; gap: 10px; }
+.lecon-card {
+  display: flex; align-items: center; gap: 14px;
+  background: $surface; border: 1.5px solid $border; border-radius: 16px; padding: 16px 18px;
+  animation: fadeUp .35s ease both; animation-delay: var(--delay, 0ms);
+  transition: border-color .2s, box-shadow .2s;
+  &:hover { border-color: $border-2; box-shadow: 0 4px 16px rgba(99,102,241,.08); }
+}
+.lecon-ordre {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: linear-gradient(135deg, $primary, $primary-2);
+  color: white; font-size: 14px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+.lecon-info { flex: 1; min-width: 0; cursor: pointer; }
+.lecon-titre { font-size: 14.5px; font-weight: 800; color: $text; margin-bottom: 3px; }
+.lecon-desc  { font-size: 12.5px; color: $muted; margin-bottom: 4px; }
+.lecon-link  { font-size: 12px; font-weight: 700; color: $primary; }
+.lecon-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+// ── Quiz grid ─────────────────────────────────────────
+.quiz-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;
+}
+.quiz-card {
+  background: $surface; border: 1.5px solid $border; border-radius: 18px; padding: 20px;
+  animation: fadeUp .4s ease both; animation-delay: var(--delay, 0ms);
+  transition: border-color .2s, box-shadow .2s;
+  &:hover { border-color: $border-2; box-shadow: 0 4px 18px rgba(99,102,241,.08); }
+}
+.quiz-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.type-badge {
+  font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+  &.quiz   { background: #eef2ff; color: $primary; border: 1px solid $border-2; }
+  &.examen { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+}
+.quiz-card-actions { display: flex; gap: 6px; }
+.quiz-titre { font-size: 15px; font-weight: 800; color: $text; margin: 0 0 10px; }
+.quiz-meta  { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: $muted; margin-bottom: 14px; }
+.btn-questions {
+  width: 100%; padding: 9px; background: $bg; border: 1.5px solid $border-2;
+  color: $primary; border-radius: 10px; font-family: inherit;
+  font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s;
+  &:hover { background: #eef2ff; }
+}
+
+// ── Questions list ────────────────────────────────────
+.questions-list { display: flex; flex-direction: column; gap: 12px; }
+.question-card {
+  background: $surface; border: 1.5px solid $border; border-radius: 16px; overflow: hidden;
+  animation: fadeUp .35s ease both; animation-delay: var(--delay, 0ms);
+  transition: border-color .2s;
+  &:hover { border-color: $border-2; }
+}
+.q-header {
+  display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px;
+  border-bottom: 1.5px solid $border;
+}
+.q-num {
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, $primary, $primary-2);
+  color: white; font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.q-enonce { flex: 1; font-size: 14px; font-weight: 700; color: $text; line-height: 1.5; }
+.q-points {
+  flex-shrink: 0; background: #fef3c7; color: #d97706; border: 1px solid #fde68a;
+  font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px;
+}
+.q-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+.choix-list { padding: 12px 18px; display: flex; flex-direction: column; gap: 8px; }
+.choix-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 10px; font-size: 13px; color: $text;
+  background: $bg; border: 1.5px solid $border;
+  &.correct { background: #d1fae5; border-color: #a7f3d0; color: #059669; font-weight: 700; }
+}
+.choix-dot { font-size: 14px; flex-shrink: 0; }
+
+// ── Icon buttons ──────────────────────────────────────
+.icon-btn {
+  width: 32px; height: 32px; border: 1.5px solid $border; border-radius: 8px;
+  background: transparent; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: $muted; transition: all .2s;
+  &.edit:hover { background: #eef2ff; color: $primary; border-color: $border-2; }
+  &.del:hover  { background: #fee2e2; color: $danger;  border-color: #fecaca; }
+}
+
+// ── Modal ─────────────────────────────────────────────
+.overlay {
+  position: fixed; inset: 0; background: rgba(30,27,75,.4); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+  animation: fadeIn .2s ease;
+}
+.modal {
+  background: $surface; border-radius: 22px; width: 100%; max-width: 520px;
+  box-shadow: 0 24px 64px rgba(99,102,241,.2);
+  animation: slideUp .3s cubic-bezier(.34,1.56,.64,1); overflow: hidden;
+  &.modal-large { max-width: 640px; }
+  &.modal-confirm { max-width: 420px; text-align: center; padding: 36px 28px 0; }
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 16px; border-bottom: 1.5px solid $border;
+  h3 { font-size: 16px; font-weight: 800; color: $text; margin: 0; }
+}
+.close-btn {
+  width: 30px; height: 30px; border: none; background: #f1f5f9; border-radius: 8px;
+  cursor: pointer; font-size: 14px; color: $muted;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+  &:hover { background: #fee2e2; color: $danger; transform: rotate(90deg); }
+}
+.modal-body { padding: 20px 24px; max-height: 65vh; overflow-y: auto; }
+.field {
+  margin-bottom: 16px;
+  label { display: block; font-size: 11.5px; font-weight: 700; color: $text; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 7px; }
+  input, textarea, select {
+    width: 100%; border: 1.5px solid $border; border-radius: 11px;
+    padding: 11px 14px; font-size: 13.5px; color: $text;
+    background: #fafbff; font-family: inherit; outline: none; resize: vertical; box-sizing: border-box;
+    transition: border-color .2s, box-shadow .2s;
+    &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba(99,102,241,.1); background: white; }
+    &::placeholder { color: #94a3b8; }
+  }
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.inline-error {
+  background: #fef2f2; border: 1.5px solid #fecaca; color: $danger;
+  border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600;
+}
+.modal-footer {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 14px 24px 20px; border-top: 1.5px solid $border;
+}
+.btn-cancel {
+  padding: 10px 18px; border: 1.5px solid $border; background: transparent;
+  border-radius: 10px; font-size: 13px; font-weight: 700; color: $muted;
+  cursor: pointer; font-family: inherit;
+  &:hover { background: $bg; }
+}
+.btn-submit {
+  display: flex; align-items: center; gap: 8px; padding: 10px 22px;
+  background: linear-gradient(135deg, $primary, $primary-2); color: white; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 14px rgba(99,102,241,.3);
+  &:hover:not(:disabled) { filter: brightness(1.05); }
+  &:disabled { opacity: .7; cursor: not-allowed; }
+}
+.btn-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+
+// ── Choix editor ──────────────────────────────────────
+.choix-editor { margin-top: 16px; }
+.choix-editor-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+  label { font-size: 11.5px; font-weight: 700; color: $text; text-transform: uppercase; letter-spacing: .05em; }
+}
+.btn-add-choix {
+  background: #eef2ff; border: 1px solid $border-2; color: $primary;
+  padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all .2s;
+  &:hover { background: #e0e7ff; }
+}
+.choix-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.choix-correct-btn {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid $border; background: $bg; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+  &.correct { background: $success; border-color: $success; color: white; }
+  &:hover { border-color: $success; }
+}
+.choix-input {
+  flex: 1; border: 1.5px solid $border; border-radius: 10px;
+  padding: 9px 12px; font-size: 13px; color: $text; background: #fafbff;
+  font-family: inherit; outline: none;
+  &:focus { border-color: $primary; background: white; }
+  &::placeholder { color: #94a3b8; }
+}
+.choix-del-btn {
+  width: 28px; height: 28px; border: none; background: #fee2e2; border-radius: 7px;
+  color: $danger; cursor: pointer; font-size: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+  &:hover { background: #fecaca; }
+  &:disabled { opacity: .4; cursor: not-allowed; }
+}
+.choix-hint { font-size: 11.5px; color: $muted; margin-top: 8px; font-style: italic; }
+
+// ── Confirm modal ─────────────────────────────────────
+.modal-icon-big { font-size: 42px; margin-bottom: 16px; }
+.modal-confirm h3 { font-size: 18px; font-weight: 800; color: $text; margin: 0 0 10px; }
+.modal-confirm p  { font-size: 13.5px; color: $muted; line-height: 1.65; strong { color: $text; } }
+.confirm-footer { display: flex; border-top: 1.5px solid $border; margin: 28px -28px 0; button { flex: 1; padding: 16px; font-family: inherit; font-size: 13px; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; } }
+.cf-cancel { background: #f8faff; color: $muted; border-radius: 0 0 0 22px; border-right: 1.5px solid $border !important; &:hover { background: $bg; } }
+.cf-delete { background: linear-gradient(135deg,$danger,#dc2626); color: white; border-radius: 0 0 22px 0; &:hover:not(:disabled) { filter: brightness(1.08); } }
+
+// ── États ─────────────────────────────────────────────
+.state-box { display: flex; align-items: center; gap: 12px; justify-content: center; padding: 40px; background: $surface; border: 1.5px solid $border; border-radius: 20px; color: $muted; font-size: 14px; }
+.spinner { width: 22px; height: 22px; border: 3px solid $border; border-top-color: $primary; border-radius: 50%; animation: spin .7s linear infinite; }
+.empty-state { text-align: center; padding: 70px 20px; background: $surface; border: 1.5px dashed $border-2; border-radius: 22px; .empty-emoji { font-size: 48px; margin-bottom: 14px; } h3 { font-size: 18px; font-weight: 800; color: $text; margin: 0 0 6px; } p { font-size: 13px; color: $muted; } }
+
+@keyframes fadeUp  { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes spin    { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  .quiz-page { padding: 20px 16px; }
+  .cours-grid { grid-template-columns: 1fr; }
+  .quiz-grid  { grid-template-columns: 1fr; }
+  .field-row  { grid-template-columns: 1fr; }
+}
+
+// ── PDF Upload (leçon) ────────────────────────────────
+.pdf-upload-zone {
+  border: 2px dashed $border-2; border-radius: 12px;
+  padding: 16px; text-align: center; cursor: pointer;
+  background: $bg; transition: all .2s;
+  &:hover { border-color: $primary; background: #eef2ff; }
+  &.has-file { border-color: #fca5a5; background: #fff5f5; border-style: solid; }
+}
+.pdf-placeholder {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; color: $muted;
+  svg { color: $primary; opacity: .6; }
+  span { font-size: 12.5px; font-weight: 600; }
+}
+.pdf-uploading { display: flex; align-items: center; gap: 8px; justify-content: center; color: $primary; font-size: 13px; }
+.pdf-ready {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #dc2626;
+  span { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+.pdf-remove {
+  width: 22px; height: 22px; border-radius: 50%; border: none;
+  background: #fee2e2; color: $danger; cursor: pointer; font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  &:hover { background: $danger; color: white; }
+}
+.spinner-sm { width: 16px; height: 16px; border: 2px solid $border; border-top-color: $primary; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+
+.field-hint { font-size: 11px; color: $muted; margin-top: 4px; display: block; }

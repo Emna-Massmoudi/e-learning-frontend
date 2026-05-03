@@ -1,0 +1,97 @@
+<div class="admin-layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo" (click)="setSection('dashboard')" title="Dashboard">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3L22 9V21H2V9L12 3Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M9 21V12H15V21" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span>E-Learning</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">Navigation</div>
+
+      <a class="nav-item" [class.active]="section === 'dashboard'" (click)="setSection('dashboard')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        Dashboard
+      </a>
+
+      <div class="nav-label" style="margin-top:12px">Gestion</div>
+
+      <a class="nav-item" [class.active]="section === 'Formateurs'" (click)="setSection('Formateurs')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Formateurs
+      </a>
+
+      <a class="nav-item" [class.active]="section === 'etudiants'" (click)="setSection('etudiants')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Étudiants
+      </a>
+
+      <a class="nav-item" [class.active]="section === 'cours'" (click)="setSection('cours')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 4H20V16H4V4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M8 20H16M12 16V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M4 9H20M9 4V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Formations
+      </a>
+
+      <a class="nav-item" [class.active]="section === 'categories'" (click)="setSection('categories')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Catégories
+      </a>
+
+      <a class="nav-item" [class.active]="section === 'blocked'" (click)="setSection('blocked')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M4.93 4.93l14.14 14.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Bloqués
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">{{ initiales }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ nomAdmin }}</div>
+          <div class="user-email">{{ emailAdmin }}</div>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="logout()" title="Déconnexion">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main-content">
+    <app-admin-dashboard  *ngIf="section === 'dashboard'"></app-admin-dashboard>
+    <app-admin-formateurs *ngIf="section === 'Formateurs'"></app-admin-formateurs>
+    <app-admin-etudiants  *ngIf="section === 'etudiants'"></app-admin-etudiants>
+    <app-admin-cours      *ngIf="section === 'cours'"></app-admin-cours>
+    <app-categories       *ngIf="section === 'categories'"></app-categories>
+    <app-admin-bloques    *ngIf="section === 'blocked'"></app-admin-bloques>
+  </main>
+
+</div>

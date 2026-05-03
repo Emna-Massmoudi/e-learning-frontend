@@ -1,0 +1,301 @@
+
+$primary:   #6366f1;
+$primary-2: #8b5cf6;
+$primary-3: #06b6d4;
+$success:   #10b981;
+$danger:    #ef4444;
+$bg:        #f8f7ff;
+$surface:   #ffffff;
+$text:      #1e1b4b;
+$muted:     #64748b;
+$border:    #e8e6ff;
+$border-2:  #c7d2fe;
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+// ── Page ──────────────────────────────────────────────
+.application-page {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  background: $bg;
+  padding: 48px 24px;
+  position: relative;
+  overflow-x: hidden;
+
+  &::before {
+    content: '';
+    position: fixed; top: -200px; right: -200px;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,102,241,.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  &::after {
+    content: '';
+    position: fixed; bottom: -200px; left: -200px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+}
+
+// ── Wrapper ───────────────────────────────────────────
+.application-wrapper {
+  max-width: 860px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+// ── Header ────────────────────────────────────────────
+.application-header {
+  margin-bottom: 32px;
+  animation: fadeUp .4s ease both;
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #eef2ff; border: 1.5px solid $border-2;
+  color: $primary; padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; margin-bottom: 16px;
+  letter-spacing: .02em;
+
+  &::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: $primary; animation: blink 2s ease-in-out infinite;
+  }
+}
+
+.application-header h1 {
+  font-size: 32px; font-weight: 900; color: $text;
+  margin: 0 0 12px; letter-spacing: -.5px; line-height: 1.2;
+}
+
+.application-header p {
+  color: $muted; font-size: 15px; line-height: 1.7;
+  max-width: 640px; margin: 0;
+}
+
+// ── Progress steps ────────────────────────────────────
+.progress-steps {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 32px;
+  background: $surface; border: 1.5px solid $border;
+  border-radius: 16px; padding: 16px 24px;
+  animation: fadeUp .4s .05s ease both;
+}
+
+.step {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute; top: 16px; left: 50%; width: 100%;
+    height: 2px; background: $border-2;
+  }
+  &.done:not(:last-child)::after { background: $success; }
+  &.active:not(:last-child)::after { background: $border-2; }
+}
+.step-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; position: relative; z-index: 1;
+  border: 2px solid $border; background: $bg; color: $muted;
+
+  .step.done &   { background: $success; border-color: $success; color: white; }
+  .step.active & {
+    background: linear-gradient(135deg, $primary, $primary-2);
+    border-color: $primary; color: white;
+    box-shadow: 0 0 0 4px rgba(99,102,241,.15);
+  }
+}
+.step-label {
+  font-size: 10.5px; font-weight: 700; color: $muted;
+  text-transform: uppercase; letter-spacing: .05em;
+  .step.done &   { color: $success; }
+  .step.active & { color: $primary; }
+}
+
+// ── Card ──────────────────────────────────────────────
+.application-card {
+  background: $surface;
+  border: 1.5px solid $border;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(99,102,241,.12);
+  animation: fadeUp .4s .1s ease both;
+}
+
+// ── Section ───────────────────────────────────────────
+.section {
+  padding: 28px 32px;
+  border-bottom: 1.5px solid $border;
+
+  &:last-child { border-bottom: none; }
+}
+
+.section-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 22px;
+}
+.section-icon {
+  width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+
+  &.blue   { background: #eef2ff; }
+  &.green  { background: #d1fae5; }
+  &.purple { background: #f5f3ff; }
+}
+.section h2 {
+  font-size: 16px; font-weight: 800; color: $text; margin: 0 0 2px;
+}
+.section-sub { font-size: 12px; color: $muted; margin: 0; }
+
+// ── Form grid ─────────────────────────────────────────
+.form-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+.form-group {
+  margin-bottom: 16px;
+
+  label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; color: $text;
+    text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;
+  }
+  .label-icon { font-size: 14px; }
+  .optional { color: $muted; font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 11px; }
+
+  input[type="text"],
+  input[type="url"],
+  input[type="email"],
+  textarea {
+    width: 100%; border: 1.5px solid $border; border-radius: 12px;
+    padding: 12px 14px; font-size: 13.5px; color: $text;
+    background: #fafbff; font-family: inherit; outline: none;
+    resize: vertical; box-sizing: border-box;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+
+    &:focus {
+      border-color: $primary; background: white;
+      box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+    }
+    &::placeholder { color: #94a3b8; }
+  }
+
+  // File input custom
+  input[type="file"] {
+    width: 100%; border: 2px dashed $border-2; border-radius: 12px;
+    padding: 14px; font-size: 13px; color: $muted;
+    background: #eef2ff; font-family: inherit; outline: none;
+    cursor: pointer; box-sizing: border-box;
+    transition: border-color .2s, background .2s;
+
+    &:hover { border-color: $primary; background: #e0e7ff; }
+    &:focus { border-color: $primary; outline: none; }
+
+    &::file-selector-button {
+      background: linear-gradient(135deg, $primary, $primary-2);
+      color: white; border: none; border-radius: 8px;
+      padding: 6px 14px; font-family: inherit;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      margin-right: 10px; transition: opacity .2s;
+      &:hover { opacity: .9; }
+    }
+  }
+}
+
+// ── File upload zone ──────────────────────────────────
+.file-upload-zone {
+  border: 2px dashed $border-2; border-radius: 12px;
+  padding: 18px 16px; background: #eef2ff;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all .2s;
+  position: relative; overflow: hidden;
+
+  &:hover { border-color: $primary; background: #e0e7ff; }
+
+  input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    width: 100%; height: 100%; border: none; background: transparent;
+    padding: 0;
+  }
+}
+.file-zone-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  background: white; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(99,102,241,.12);
+}
+.file-zone-text { font-size: 12.5px; color: $primary; font-weight: 600; }
+.file-zone-sub  { font-size: 11px; color: $muted; margin-top: 2px; }
+
+// ── Messages ──────────────────────────────────────────
+.message {
+  margin: 0 32px 20px; padding: 12px 16px;
+  border-radius: 12px; font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+
+  &.success { background: #d1fae5; border: 1.5px solid #a7f3d0; color: #059669; }
+  &.error   { background: #fee2e2; border: 1.5px solid #fecaca; color: $danger; }
+}
+
+// ── Actions ───────────────────────────────────────────
+.actions {
+  padding: 24px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: #fafbff; border-top: 1.5px solid $border;
+  gap: 12px;
+}
+
+.actions-info {
+  font-size: 12px; color: $muted; display: flex; align-items: center; gap: 6px;
+  svg { color: $primary; flex-shrink: 0; }
+}
+
+.btn-submit {
+  display: flex; align-items: center; gap: 9px;
+  padding: 13px 28px; min-width: 220px; justify-content: center;
+  background: linear-gradient(135deg, $primary, $primary-2);
+  color: white; border: none; border-radius: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px; font-weight: 800; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(99,102,241,.38);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+  position: relative; overflow: hidden;
+
+  &::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+    transition: left .5s ease;
+  }
+  &:hover::after { left: 100%; }
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(99,102,241,.5);
+  }
+  &:disabled { opacity: .7; cursor: not-allowed; transform: none; box-shadow: none; }
+}
+
+.btn-spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.4); border-top-color: white;
+  border-radius: 50%; animation: spin .7s linear infinite;
+}
+
+// ── Animations ────────────────────────────────────────
+@keyframes fadeUp  { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes blink   { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+// ── Responsive ────────────────────────────────────────
+@media (max-width: 768px) {
+  .application-page { padding: 24px 16px; }
+  .section { padding: 22px 20px; }
+  .actions { padding: 18px 20px; flex-direction: column; align-items: stretch; }
+  .btn-submit { min-width: unset; width: 100%; }
+  .progress-steps { padding: 14px 16px; }
+  .application-header h1 { font-size: 26px; }
+}

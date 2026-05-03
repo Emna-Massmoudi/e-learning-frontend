@@ -1,0 +1,210 @@
+<div class="application-page">
+  <div class="application-wrapper">
+
+    <!-- HEADER -->
+    <div class="application-header">
+      <span class="badge">E-Learning Platform</span>
+      <h1>Candidature Formateur</h1>
+      <p>
+        Complétez votre dossier professionnel pour permettre à l'administrateur
+        d'examiner votre profil et valider votre accès à l'espace formateur.
+      </p>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-steps">
+      <div class="step done">
+        <div class="step-dot">✓</div>
+        <div class="step-label">Inscription</div>
+      </div>
+      <div class="step active">
+        <div class="step-dot">2</div>
+        <div class="step-label">Candidature</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">3</div>
+        <div class="step-label">Validation</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">4</div>
+        <div class="step-label">Activé</div>
+      </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="application-card">
+      <form (ngSubmit)="onSubmit()">
+
+        <!-- ── Section 1 : Infos professionnelles ── -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon blue">💼</div>
+            <div>
+              <h2>Informations professionnelles</h2>
+              <p class="section-sub">Présentez votre expertise et vos liens professionnels</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>
+                <span class="label-icon">🎯</span>
+                Spécialité
+              </label>
+              <input type="text" [(ngModel)]="specialite" name="specialite"
+                placeholder="Ex : Développement Web, Data Science…" required/>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <span class="label-icon">🌐</span>
+                Portfolio
+                <span class="optional">(optionnel)</span>
+              </label>
+              <input type="url" [(ngModel)]="portfolio" name="portfolio"
+                placeholder="https://mon-portfolio.com"/>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <span class="label-icon">🐙</span>
+                GitHub
+                <span class="optional">(optionnel)</span>
+              </label>
+              <input type="url" [(ngModel)]="github" name="github"
+                placeholder="https://github.com/username"/>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <span class="label-icon">💼</span>
+                LinkedIn
+                <span class="optional">(optionnel)</span>
+              </label>
+              <input type="url" [(ngModel)]="linkedin" name="linkedin"
+                placeholder="https://linkedin.com/in/username"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span class="label-icon">📝</span>
+              Bio
+            </label>
+            <textarea [(ngModel)]="bio" name="bio" rows="4"
+              placeholder="Présentez brièvement votre parcours, vos compétences et votre expérience…"></textarea>
+          </div>
+        </div>
+
+        <!-- ── Section 2 : Pièces justificatives ── -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon green">📎</div>
+            <div>
+              <h2>Pièces justificatives</h2>
+              <p class="section-sub">Fichiers PDF uniquement — max 10 Mo par fichier</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label><span class="label-icon">📄</span> CV</label>
+              <div class="file-upload-zone">
+                <input type="file" (change)="onFileSelect($event, 'cv')" accept=".pdf"/>
+                <div class="file-zone-icon">📄</div>
+                <div>
+                  <div class="file-zone-text">{{ cvFile ? cvFile.name : 'Choisir un fichier PDF' }}</div>
+                  <div class="file-zone-sub">Cliquez ou glissez votre CV</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label><span class="label-icon">🎓</span> Diplôme <span class="optional">(optionnel)</span></label>
+              <div class="file-upload-zone">
+                <input type="file" (change)="onFileSelect($event, 'diplome')" accept=".pdf"/>
+                <div class="file-zone-icon">🎓</div>
+                <div>
+                  <div class="file-zone-text">{{ diplomeFile ? diplomeFile.name : 'Choisir un fichier PDF' }}</div>
+                  <div class="file-zone-sub">Cliquez ou glissez votre diplôme</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label><span class="label-icon">📜</span> Certificat <span class="optional">(optionnel)</span></label>
+              <div class="file-upload-zone">
+                <input type="file" (change)="onFileSelect($event, 'certificat')" accept=".pdf"/>
+                <div class="file-zone-icon">📜</div>
+                <div>
+                  <div class="file-zone-text">{{ certificatFile ? certificatFile.name : 'Choisir un fichier PDF' }}</div>
+                  <div class="file-zone-sub">Cliquez ou glissez votre certificat</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label><span class="label-icon">📋</span> Attestation <span class="optional">(optionnel)</span></label>
+              <div class="file-upload-zone">
+                <input type="file" (change)="onFileSelect($event, 'attestation')" accept=".pdf"/>
+                <div class="file-zone-icon">📋</div>
+                <div>
+                  <div class="file-zone-text">{{ attestationFile ? attestationFile.name : 'Choisir un fichier PDF' }}</div>
+                  <div class="file-zone-sub">Cliquez ou glissez votre attestation</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section 3 : Motivation ── -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon purple">💡</div>
+            <div>
+              <h2>Lettre de motivation</h2>
+              <p class="section-sub">Expliquez pourquoi vous souhaitez rejoindre la plateforme</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span class="label-icon">✍️</span>
+              Votre motivation
+            </label>
+            <textarea [(ngModel)]="motivation" name="motivation" rows="6"
+              placeholder="Décrivez votre passion pour l'enseignement, vos objectifs et ce que vous apporterez aux étudiants…"></textarea>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="message success" *ngIf="successMessage">
+          ✅ {{ successMessage }}
+        </div>
+        <div class="message error" *ngIf="errorMessage">
+          ⚠️ {{ errorMessage }}
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <div class="actions-info">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Votre candidature sera examinée sous 48h
+          </div>
+          <button type="submit" class="btn-submit" [disabled]="loading">
+            <span class="btn-spinner" *ngIf="loading"></span>
+            <svg *ngIf="!loading" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ loading ? 'Envoi en cours…' : 'Envoyer ma candidature' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

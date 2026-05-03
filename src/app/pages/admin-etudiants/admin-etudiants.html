@@ -1,0 +1,139 @@
+<!-- ══════════════════════════════════════════════════
+     GESTION ÉTUDIANTS — Admin
+══════════════════════════════════════════════════ -->
+<div class="dash">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="9" cy="7" r="4" stroke="white" stroke-width="1.8"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Gestion des étudiants</h1>
+        <p class="topbar-sub">Consultez et gérez tous les étudiants inscrits</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent:#6366f1;--accent-light:#eef2ff">
+      <div class="stat-icon">👨‍🎓</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ etudiants.length }}</div>
+        <div class="stat-label">Total inscrits</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#10b981;--accent-light:#d1fae5">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ actifCount }}</div>
+        <div class="stat-label">Actifs</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#ef4444;--accent-light:#fee2e2">
+      <div class="stat-icon">🚫</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ bloqueCount }}</div>
+        <div class="stat-label">Bloqués</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+        <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" [(ngModel)]="searchQuery"
+        placeholder="Rechercher un étudiant par nom ou email…"/>
+      <button *ngIf="searchQuery" class="search-clear" (click)="searchQuery = ''">✕</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="state-box"><div class="spinner"></div><span>Chargement…</span></div>
+  <div *ngIf="!loading && errorMessage" class="state-box error-box"><span>⚠️ {{ errorMessage }}</span></div>
+  <div *ngIf="!loading && !errorMessage && etudiants.length === 0" class="empty-state">
+    <div class="empty-emoji">📭</div><h3>Aucun étudiant inscrit</h3>
+  </div>
+
+  <!-- GRID -->
+  <div *ngIf="!loading && !errorMessage && filteredEtudiants().length > 0" class="etudiants-grid">
+    <div *ngFor="let e of filteredEtudiants(); let i = index"
+         class="etudiant-card" [style.--delay]="i * 55 + 'ms'">
+
+      <div class="card-top">
+        <div class="etudiant-avatar">{{ getInitiales(e.nom) }}</div>
+        <div class="etudiant-info">
+          <h3>{{ e.nom }}</h3>
+          <p>{{ e.email }}</p>
+        </div>
+        <span class="statut-pill" [ngClass]="getStatusClass(e.status)">{{ e.status }}</span>
+      </div>
+
+      <div class="card-details">
+        <div class="detail-item">
+          <span class="detail-lbl">ID</span>
+          <span class="detail-val mono">#{{ e.id }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-lbl">Statut</span>
+          <span class="detail-val">{{ e.status || '—' }}</span>
+        </div>
+      </div>
+
+      <!-- Action bloquer/débloquer -->
+      <div class="card-action">
+        <button *ngIf="!estBloque(e)" class="btn-bloquer" (click)="ouvrirConfirm(e, 'bloquer')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Bloquer
+        </button>
+        <button *ngIf="estBloque(e)" class="btn-debloquer" (click)="ouvrirConfirm(e, 'debloquer')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M7 11V7a5 5 0 0110 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Débloquer
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMATION -->
+  <div *ngIf="showConfirm" class="overlay" (click)="fermerConfirm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-icon">{{ confirmAction === 'bloquer' ? '🔒' : '🔓' }}</div>
+      <h3>{{ confirmAction === 'bloquer' ? 'Bloquer cet étudiant ?' : 'Débloquer cet étudiant ?' }}</h3>
+      <p><strong>{{ confirmTarget?.nom }}</strong><br>
+        <span *ngIf="confirmAction === 'bloquer'">Cet étudiant ne pourra plus accéder à la plateforme.</span>
+        <span *ngIf="confirmAction === 'debloquer'">Cet étudiant pourra de nouveau accéder à la plateforme.</span>
+      </p>
+      <div class="modal-note" [class.danger]="confirmAction === 'bloquer'">
+        {{ confirmAction === 'bloquer' ? '⚠️ Accès bloqué immédiatement' : '✦ Statut → ACTIF' }}
+      </div>
+      <div class="confirm-footer">
+        <button class="cf-cancel" (click)="fermerConfirm()">Annuler</button>
+        <button class="cf-confirm"
+          [class.cf-bloquer]="confirmAction === 'bloquer'"
+          [class.cf-debloquer]="confirmAction === 'debloquer'"
+          (click)="executer()" [disabled]="confirmLoading">
+          <span class="btn-spinner" *ngIf="confirmLoading"></span>
+          {{ confirmLoading ? 'En cours…' : (confirmAction === 'bloquer' ? '🔒 Bloquer' : '🔓 Débloquer') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,163 @@
+<div class="home-layout">
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3L22 9V21H2V9L12 3Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M9 21V12H15V21" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">E-Learning</span>
+    </div>
+
+    <div class="nav-actions">
+      <ng-container *ngIf="!isLoggedIn()">
+        <button class="btn-nav-outline" (click)="goLogin()">Se connecter</button>
+        <button class="btn-nav-primary" (click)="goRegister()">S'inscrire</button>
+      </ng-container>
+      <ng-container *ngIf="isLoggedIn()">
+        <button class="btn-nav-primary" (click)="router.navigate([getDashboardRoute()])">
+          Mon espace →
+        </button>
+      </ng-container>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🎓 Plateforme E-Learning</div>
+      <h1>Apprenez à votre <span class="hero-highlight">rythme</span></h1>
+      <p>Découvrez des formations de qualité dispensées par des formateurs experts. Développez vos compétences où que vous soyez.</p>
+      <div class="hero-actions">
+        <button class="btn-hero-primary" (click)="goRegister()" *ngIf="!isLoggedIn()">
+          Commencer gratuitement →
+        </button>
+        <button class="btn-hero-primary" (click)="router.navigate([getDashboardRoute()])" *ngIf="isLoggedIn()">
+          Accéder à mon espace →
+        </button>
+        <a class="btn-hero-outline" href="#cours">Voir les formations</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-num">{{ cours.length }}</span>
+          <span class="stat-lbl">Formations</span>
+        </div>
+        <div class="hero-stat-sep"></div>
+        <div class="hero-stat">
+          <span class="stat-num">{{ getCategories().length }}</span>
+          <span class="stat-lbl">Catégories</span>
+        </div>
+        <div class="hero-stat-sep"></div>
+        <div class="hero-stat">
+          <span class="stat-num">100%</span>
+          <span class="stat-lbl">En ligne</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card float-1">📚 Formation Python</div>
+      <div class="hero-card float-2">🎬 Vidéo + PDF</div>
+      <div class="hero-card float-3">📝 Quiz interactifs</div>
+      <div class="hero-blob"></div>
+    </div>
+  </section>
+
+  <!-- ══ CATALOGUE ══ -->
+  <section class="catalogue-section" id="cours">
+    <div class="section-header">
+      <h2>Toutes les formations</h2>
+      <p>{{ cours.length }} formation(s) disponible(s) sur la plateforme</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="text" class="search-input" [(ngModel)]="searchQuery"
+          placeholder="Rechercher une formation…"/>
+        <button *ngIf="searchQuery" class="search-clear" (click)="searchQuery = ''">✕</button>
+      </div>
+      <select class="filter-select" [(ngModel)]="filterCat">
+        <option value="">Toutes catégories</option>
+        <option *ngFor="let cat of getCategories()" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="state-box">
+      <div class="spinner"></div><span>Chargement des formations…</span>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && filteredCours().length === 0" class="empty-state">
+      <div class="empty-emoji">🔍</div>
+      <h3>Aucune formation trouvée</h3>
+      <p>Essayez d'autres termes de recherche.</p>
+    </div>
+
+    <!-- Grid -->
+    <div class="cours-grid" *ngIf="!loading && filteredCours().length > 0">
+      <div *ngFor="let c of filteredCours(); let i = index"
+           class="cours-card" [style.--delay]="i * 60 + 'ms'">
+
+        <!-- Banner -->
+        <div class="card-banner" [style.background]="getBannerGradient(c.categorieId)">
+          <img *ngIf="c.imageUrl"
+            [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'http://localhost:8081' + c.imageUrl"
+            class="card-banner-img" (error)="$any($event.target).style.display='none'"/>
+          <div class="card-emoji" [class.hidden]="c.imageUrl">{{ getIcon(c.categorieNom) }}</div>
+          <div class="card-badges">
+            <span *ngIf="c.niveau" class="badge-niveau">{{ c.niveau }}</span>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="chip-cat">{{ c.categorieNom }}</span>
+            <span class="chip-sous" *ngIf="c.sousCategorieNom">{{ c.sousCategorieNom }}</span>
+          </div>
+          <h3 class="card-titre">{{ c.titre }}</h3>
+          <p class="card-desc">{{ c.description || 'Aucune description.' }}</p>
+
+          <div class="card-formateur">
+            <div class="formateur-av">{{ getInitiales(c.formateurNom) }}</div>
+            <span>{{ c.formateurNom }}</span>
+          </div>
+
+          <div class="card-infos">
+            <span *ngIf="c.duree">⏱ {{ c.duree }}</span>
+            <span *ngIf="c.niveau">🎯 {{ c.niveau }}</span>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+          <button class="btn-inscrire" (click)="inscrire(c)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            {{ isLoggedIn() ? 'Accéder' : "S'inscrire" }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="footer-brand">
+      <div class="brand-icon small">🎓</div>
+      <span>E-Learning Platform</span>
+    </div>
+    <p>© 2025 E-Learning. Tous droits réservés.</p>
+  </footer>
+
+</div>

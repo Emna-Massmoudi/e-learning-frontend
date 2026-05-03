@@ -1,0 +1,229 @@
+<div class="profile-page">
+  <div class="profile-wrapper">
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="state-box">
+      <div class="spinner"></div>
+      <span>Chargement du profil…</span>
+    </div>
+
+    <!-- ERREUR -->
+    <div *ngIf="!loading && errorMessage" class="state-box error-box">
+      ⚠️ {{ errorMessage }}
+    </div>
+
+    <ng-container *ngIf="!loading && profil">
+
+      <!-- HEADER -->
+      <div class="profile-header">
+        <button class="btn-back" (click)="retourDashboard()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Retour au dashboard
+        </button>
+        <button class="btn-logout" (click)="logout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Déconnexion
+        </button>
+      </div>
+
+      <!-- SUCCESS -->
+      <div *ngIf="successMessage" class="alert success">
+        ✅ {{ successMessage }}
+      </div>
+
+      <!-- HERO CARD -->
+      <div class="hero-card">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+          <div class="avatar-wrap">
+            <div class="avatar">{{ getInitiales(profil.nom) }}</div>
+            <div class="avatar-ring"></div>
+          </div>
+          <div class="hero-info">
+            <h1>{{ profil.nom }}</h1>
+            <p class="hero-email">{{ profil.email }}</p>
+            <p class="hero-spec" *ngIf="profil.specialite">🎯 {{ profil.specialite }}</p>
+          </div>
+          <div class="hero-right">
+            <span class="statut-pill" [ngClass]="getStatutClass(profil.status)">
+              {{ getStatutLabel(profil.status) }}
+            </span>
+            <button class="btn-edit" (click)="ouvrirEdition()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              Modifier le profil
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <div class="profile-grid">
+
+        <!-- Bio -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon blue">📝</div>
+            <h3>Biographie</h3>
+          </div>
+          <p class="bio-text" *ngIf="profil.bio">{{ profil.bio }}</p>
+          <p class="empty-text" *ngIf="!profil.bio">Aucune biographie renseignée.</p>
+        </div>
+
+        <!-- Motivation -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon purple">💡</div>
+            <h3>Motivation</h3>
+          </div>
+          <p class="bio-text" *ngIf="profil.motivation">{{ profil.motivation }}</p>
+          <p class="empty-text" *ngIf="!profil.motivation">Aucune motivation renseignée.</p>
+        </div>
+
+        <!-- Liens -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon green">🔗</div>
+            <h3>Liens professionnels</h3>
+          </div>
+          <div class="links-list">
+            <a *ngIf="profil.portfolio" [href]="profil.portfolio" target="_blank" class="link-item">
+              <span class="link-icon">🌐</span>
+              <div>
+                <div class="link-label">Portfolio</div>
+                <div class="link-url">{{ profil.portfolio }}</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </a>
+            <p class="empty-text" *ngIf="!profil.portfolio">Aucun lien renseigné.</p>
+          </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-icon orange">📎</div>
+            <h3>Documents joints</h3>
+          </div>
+          <div class="docs-list">
+            <a *ngIf="profil.cvUrl" [href]="getFileUrl(profil.cvUrl)" target="_blank" class="doc-item">
+              <div class="doc-icon">📄</div>
+              <div class="doc-info">
+                <div class="doc-name">Curriculum Vitae</div>
+                <div class="doc-type">PDF</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </a>
+            <a *ngIf="profil.diplomeUrl" [href]="getFileUrl(profil.diplomeUrl)" target="_blank" class="doc-item">
+              <div class="doc-icon">🎓</div>
+              <div class="doc-info">
+                <div class="doc-name">Diplôme</div>
+                <div class="doc-type">PDF</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </a>
+            <a *ngIf="profil.certificatUrl" [href]="getFileUrl(profil.certificatUrl)" target="_blank" class="doc-item">
+              <div class="doc-icon">📜</div>
+              <div class="doc-info">
+                <div class="doc-name">Certificat</div>
+                <div class="doc-type">PDF</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </a>
+            <a *ngIf="profil.attestationUrl" [href]="getFileUrl(profil.attestationUrl)" target="_blank" class="doc-item">
+              <div class="doc-icon">📋</div>
+              <div class="doc-info">
+                <div class="doc-name">Attestation</div>
+                <div class="doc-type">PDF</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </a>
+            <p class="empty-text" *ngIf="!profil.cvUrl && !profil.diplomeUrl && !profil.certificatUrl && !profil.attestationUrl">
+              Aucun document joint.
+            </p>
+          </div>
+        </div>
+
+        <!-- Commentaire admin -->
+        <div class="info-card full-width" *ngIf="profil.commentaireAdmin">
+          <div class="card-header">
+            <div class="card-icon red">💬</div>
+            <h3>Message de l'administrateur</h3>
+          </div>
+          <div class="admin-comment">{{ profil.commentaireAdmin }}</div>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <!-- ══ MODAL EDITION ══ -->
+    <div *ngIf="editMode" class="overlay" (click)="fermerEdition()">
+      <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+          <div class="modal-title">
+            <div class="modal-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Modifier le profil</h3>
+              <p>Mettez à jour vos informations</p>
+            </div>
+          </div>
+          <button class="close-btn" (click)="fermerEdition()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="field">
+            <label>Nom complet</label>
+            <input type="text" [(ngModel)]="editNom" placeholder="Votre nom"/>
+          </div>
+          <div class="field">
+            <label>Spécialité</label>
+            <input type="text" [(ngModel)]="editSpecialite" placeholder="Ex: Développement Web"/>
+          </div>
+          <div class="field">
+            <label>Portfolio / Site web</label>
+            <input type="url" [(ngModel)]="editPortfolio" placeholder="https://…"/>
+          </div>
+          <div class="field">
+            <label>Bio</label>
+            <textarea [(ngModel)]="editBio" rows="5" placeholder="Présentez-vous…"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="fermerEdition()">Annuler</button>
+          <button class="btn-submit" (click)="sauvegarderProfil()" [disabled]="saveLoading">
+            <span class="btn-spinner" *ngIf="saveLoading"></span>
+            <svg *ngIf="!saveLoading" width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            {{ saveLoading ? 'Enregistrement…' : 'Enregistrer' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

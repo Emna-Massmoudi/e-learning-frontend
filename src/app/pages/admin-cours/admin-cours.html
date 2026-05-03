@@ -1,0 +1,262 @@
+<!-- cSpell:ignore BROUILLON ATTENTE VALIDATION SUPPRIME -->
+<!-- ══════════════════════════════════════════════════
+     GESTION DES COURS — Admin
+══════════════════════════════════════════════════ -->
+<div class="dash">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M4 4H20V16H4V4Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M8 20H16M12 16V20" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M4 9H20M9 4V9" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Gestion des formations</h1>
+        <p class="topbar-sub">Publiez et gérez l'ensemble des formations de la plateforme</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent:#6366f1;--accent-light:#eef2ff">
+      <div class="stat-icon">📚</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ listeCours.length }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#10b981;--accent-light:#d1fae5">
+      <div class="stat-icon">🌍</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ getCountByStatut('PUBLIE') }}</div>
+        <div class="stat-label">Publiés</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#f59e0b;--accent-light:#fef3c7">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ getCountByStatut('EN_ATTENTE_VALIDATION') }}</div>
+        <div class="stat-label">En attente</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#94a3b8;--accent-light:#f1f5f9">
+      <div class="stat-icon">📝</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ getCountByStatut('BROUILLON') }}</div>
+        <div class="stat-label">Brouillons</div>
+      </div>
+    </div>
+    <div class="stat-card" style="--accent:#ef4444;--accent-light:#fee2e2">
+      <div class="stat-icon">🚫</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ getCountByStatut('SUPPRIME') }}</div>
+        <div class="stat-label">Supprimés</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+        <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" [(ngModel)]="searchQuery"
+        placeholder="Rechercher une formation, formateur…"/>
+      <button *ngIf="searchQuery" class="search-clear" (click)="searchQuery = ''">✕</button>
+    </div>
+    <select class="filter-select" [(ngModel)]="filterStatut">
+      <option value="">Tous les statuts</option>
+      <option value="BROUILLON">Brouillon</option>
+      <option value="EN_ATTENTE_VALIDATION">En attente</option>
+      <option value="PUBLIE">Publié</option>
+      <option value="SUPPRIME">Supprimé</option>
+    </select>
+    <select class="filter-select" [(ngModel)]="filterCategorie">
+      <option value="">Toutes catégories</option>
+      <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.nom }}</option>
+    </select>
+    <div class="view-toggle">
+      <button class="view-btn" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'" title="Grille">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+      </button>
+      <button class="view-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'" title="Liste">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M8 6H21M8 12H21M8 18H21M3 6H3.01M3 12H3.01M3 18H3.01"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- RÉSULTATS -->
+  <div class="results-bar">
+    <span class="results-count">
+      <strong>{{ filteredCours().length }}</strong> formation(s) trouvée(s)
+      <span *ngIf="searchQuery"> pour "{{ searchQuery }}"</span>
+    </span>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="state-box">
+    <div class="spinner"></div>
+    <span>Chargement…</span>
+  </div>
+
+  <!-- ERREUR -->
+  <div *ngIf="!loading && errorMessage" class="state-box error-box">
+    <span>⚠️ {{ errorMessage }}</span>
+  </div>
+
+  <!-- EMPTY -->
+  <div *ngIf="!loading && !errorMessage && listeCours.length === 0" class="empty-state">
+    <div class="empty-emoji">📭</div>
+    <h3>Aucune formation disponible</h3>
+    <p>Les formateurs n'ont pas encore soumis de formations.</p>
+  </div>
+
+  <!-- NO RESULTS -->
+  <div *ngIf="!loading && !errorMessage && listeCours.length > 0 && filteredCours().length === 0" class="empty-state">
+    <div class="empty-emoji">🔍</div>
+    <h3>Aucun résultat</h3>
+    <p>Aucune formation ne correspond à vos filtres.</p>
+    <button class="btn-cancel" (click)="resetFilters()">Effacer les filtres</button>
+  </div>
+
+  <!-- ══ VUE GRILLE ══ -->
+  <div *ngIf="!loading && !errorMessage && filteredCours().length > 0 && viewMode === 'grid'" class="cours-grid">
+    <div *ngFor="let c of filteredCours(); let i = index" class="cours-card" [style.--delay]="i * 70 + 'ms'">
+
+      <div class="card-banner" [style.background]="getBannerGradient(c.categorieId)">
+        <div class="card-banner-emoji">{{ getIcon(c.categorieNom) }}</div>
+        <div class="card-actions">
+          <button class="act-btn act-view" (click)="voirDetail(c)" title="Voir détail">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+          <button class="act-btn act-del" (click)="confirmAction(c, 'supprimer')" title="Supprimer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7H20M10 11V16M14 11V16M5 7L6 19a2 2 0 002 2h8a2 2 0 002-2L19 7M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"
+                stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <span class="status-badge" [ngClass]="getStatutCssClass(c.etatPublication)">
+          {{ getStatutLabel(c.etatPublication) }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="meta-chip chip-cat">{{ c.categorieNom }}</span>
+          <span class="meta-chip chip-sous">{{ c.sousCategorieNom }}</span>
+        </div>
+        <h3 class="card-title">{{ c.titre }}</h3>
+        <p class="card-desc">{{ c.description || 'Aucune description renseignée' }}</p>
+        <div class="card-formateur">
+          <div class="formateur-avatar">{{ getInitiales(c.formateurNom) }}</div>
+          <span class="formateur-name">Par <strong>{{ c.formateurNom }}</strong></span>
+        </div>
+
+        <div class="card-footer-actions">
+          <!-- BROUILLON ou EN_ATTENTE_VALIDATION → Publier -->
+          <ng-container *ngIf="c.etatPublication === 'BROUILLON' || c.etatPublication === 'EN_ATTENTE_VALIDATION'">
+            <button class="btn-action btn-publier" (click)="confirmAction(c, 'publier')">🚀 Publier</button>
+            <button class="btn-action btn-suppr"   (click)="confirmAction(c, 'supprimer')">🗑</button>
+          </ng-container>
+          <!-- PUBLIE → voir détail ou supprimer -->
+          <ng-container *ngIf="c.etatPublication === 'PUBLIE'">
+            <button class="btn-action btn-valider" (click)="voirDetail(c)">👁 Détail</button>
+            <button class="btn-action btn-suppr"   (click)="confirmAction(c, 'supprimer')">🗑 Supprimer</button>
+          </ng-container>
+          <!-- SUPPRIME → republier -->
+          <ng-container *ngIf="c.etatPublication === 'SUPPRIME'">
+            <button class="btn-action btn-publier" (click)="confirmAction(c, 'publier')">🚀 Republier</button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VUE LISTE ══ -->
+  <div *ngIf="!loading && !errorMessage && filteredCours().length > 0 && viewMode === 'list'" class="cours-list">
+    <div *ngFor="let c of filteredCours(); let i = index" class="cours-row" [style.--delay]="i * 55 + 'ms'">
+
+      <div class="row-emoji">{{ getIcon(c.categorieNom) }}</div>
+      <div class="row-main">
+        <div class="row-title">{{ c.titre }}</div>
+        <div class="row-chips">
+          <span class="meta-chip chip-cat">{{ c.categorieNom }}</span>
+          <span class="meta-chip chip-sous">{{ c.sousCategorieNom }}</span>
+        </div>
+      </div>
+      <div class="row-formateur">👤 {{ c.formateurNom }}</div>
+      <div class="row-status">
+        <span class="status-pill" [ngClass]="getStatutCssClass(c.etatPublication)">
+          {{ getStatutLabel(c.etatPublication) }}
+        </span>
+      </div>
+      <div class="row-actions">
+        <button class="row-btn" (click)="voirDetail(c)" title="Détail">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </button>
+        <button
+          *ngIf="c.etatPublication === 'BROUILLON' || c.etatPublication === 'EN_ATTENTE_VALIDATION' || c.etatPublication === 'SUPPRIME'"
+          class="row-btn primary" (click)="confirmAction(c, 'publier')" title="Publier">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="row-btn danger" (click)="confirmAction(c, 'supprimer')" title="Supprimer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M4 7H20M10 11V16M14 11V16M5 7L6 19a2 2 0 002 2h8a2 2 0 002-2L19 7M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL CONFIRMATION ══ -->
+  <div *ngIf="showConfirm" class="overlay" (click)="closeConfirm()">
+    <div class="modal modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon-big" [ngClass]="'icon-' + pendingAction">
+        <span>{{ getActionIcon(pendingAction) }}</span>
+      </div>
+      <h3>{{ getActionTitle(pendingAction) }}</h3>
+      <p>
+        Vous allez {{ getActionVerb(pendingAction) }}
+        <strong>{{ itemToAction?.titre }}</strong>.
+        {{ getActionWarning(pendingAction) }}
+      </p>
+      <div class="modal-warn" [ngClass]="'warn-' + pendingAction">
+        {{ getActionNote(pendingAction) }}
+      </div>
+      <div class="confirm-footer">
+        <button class="cf-cancel" (click)="closeConfirm()">Annuler</button>
+        <button class="cf-confirm" [ngClass]="'cf-' + pendingAction"
+          (click)="executeAction()" [disabled]="loading">
+          <span class="btn-spinner" *ngIf="loading"></span>
+          {{ loading ? 'En cours…' : getActionLabel(pendingAction) }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

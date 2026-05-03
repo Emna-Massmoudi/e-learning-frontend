@@ -1,0 +1,351 @@
+<div class="quiz-page">
+
+  <!-- ══ VUE : LISTE DES COURS ══ -->
+  <ng-container *ngIf="vue === 'cours'">
+    <div class="page-header">
+      <div>
+        <h1>📝 Gestion des quiz</h1>
+        <p class="page-sub">Sélectionnez un cours pour gérer ses leçons et quiz</p>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="state-box"><div class="spinner"></div><span>Chargement…</span></div>
+
+    <div *ngIf="!loading && mesCours.length === 0" class="empty-state">
+      <div class="empty-emoji">📭</div>
+      <h3>Aucun cours disponible</h3>
+      <p>Créez d'abord une formation depuis "Mes formations".</p>
+    </div>
+
+    <div class="cours-grid" *ngIf="!loading && mesCours.length > 0">
+      <div *ngFor="let c of mesCours; let i = index"
+           class="cours-card" [style.--delay]="i * 60 + 'ms'"
+           (click)="selectionnerCours(c)">
+        <div class="card-banner" [style.background]="getBannerGradient(c.categorieId)">
+          <img *ngIf="c.imageUrl"
+            [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'http://localhost:8081' + c.imageUrl"
+            class="card-img" (error)="$any($event.target).style.display='none'"/>
+          <span *ngIf="!c.imageUrl" class="card-emoji">{{ getIcon(c.categorieNom) }}</span>
+        </div>
+        <div class="card-body">
+          <h3>{{ c.titre }}</h3>
+          <p>{{ c.categorieNom }}</p>
+          <div class="card-arrow">Gérer les quiz →</div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══ VUE : LEÇONS ══ -->
+  <ng-container *ngIf="vue === 'lecons'">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <button class="btn-back" (click)="retourCours()">← Mes cours</button>
+        <span>/</span>
+        <span class="bc-current">{{ coursSelectionne?.titre }}</span>
+      </div>
+      <button class="btn-primary" (click)="openLeconForm()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Ajouter une leçon
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="state-box"><div class="spinner"></div><span>Chargement…</span></div>
+
+    <div *ngIf="!loading && lecons.length === 0" class="empty-state">
+      <div class="empty-emoji">📖</div>
+      <h3>Aucune leçon</h3>
+      <p>Ajoutez des leçons à ce cours pour créer des quiz.</p>
+    </div>
+
+    <div class="lecons-list" *ngIf="!loading && lecons.length > 0">
+      <div *ngFor="let l of lecons; let i = index" class="lecon-card" [style.--delay]="i * 55 + 'ms'">
+        <div class="lecon-ordre">{{ l.ordre }}</div>
+        <div class="lecon-info" (click)="selectionnerLecon(l)">
+          <div class="lecon-titre">{{ l.titre }}</div>
+          <div class="lecon-desc" *ngIf="l.description">{{ l.description }}</div>
+          <div class="lecon-link">Voir les quiz →</div>
+        </div>
+        <div class="lecon-actions">
+          <button class="icon-btn edit" (click)="openLeconForm(l)" title="Modifier">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button class="icon-btn del" (click)="confirmerSupprimer('lecon', l.id, l.titre)" title="Supprimer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7H20M10 11V16M14 11V16M5 7L6 19a2 2 0 002 2h8a2 2 0 002-2L19 7M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══ VUE : QUIZ / ÉVALUATIONS ══ -->
+  <ng-container *ngIf="vue === 'quiz'">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <button class="btn-back" (click)="retourCours()">← Mes cours</button>
+        <span>/</span>
+        <button class="btn-bc" (click)="retourLecons()">{{ coursSelectionne?.titre }}</button>
+        <span>/</span>
+        <span class="bc-current">{{ leconSelectionnee?.titre }}</span>
+      </div>
+      <button class="btn-primary" (click)="openEvalForm()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Créer un quiz
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="state-box"><div class="spinner"></div><span>Chargement…</span></div>
+
+    <div *ngIf="!loading && evaluations.length === 0" class="empty-state">
+      <div class="empty-emoji">📝</div>
+      <h3>Aucun quiz pour cette leçon</h3>
+      <p>Créez un quiz ou un examen pour évaluer vos étudiants.</p>
+    </div>
+
+    <div class="quiz-grid" *ngIf="!loading && evaluations.length > 0">
+      <div *ngFor="let e of evaluations; let i = index" class="quiz-card" [style.--delay]="i * 60 + 'ms'">
+        <div class="quiz-card-header">
+          <span class="type-badge" [ngClass]="getTypeClass(e.type)">{{ getTypeLabel(e.type) }}</span>
+          <div class="quiz-card-actions">
+            <button class="icon-btn edit" (click)="openEvalForm(e)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="icon-btn del" (click)="confirmerSupprimer('eval', e.id, e.titre)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M4 7H20M10 11V16M14 11V16M5 7L6 19a2 2 0 002 2h8a2 2 0 002-2L19 7M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <h3 class="quiz-titre">{{ e.titre }}</h3>
+        <div class="quiz-meta">
+          <span>📊 Note max : {{ e.noteMax }}</span>
+          <span>✅ Note min : {{ e.noteMin }}</span>
+          <span>❓ {{ e.questions.length }} question(s)</span>
+        </div>
+        <button class="btn-questions" (click)="selectionnerEval(e)">
+          Gérer les questions →
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══ VUE : QUESTIONS ══ -->
+  <ng-container *ngIf="vue === 'questions'">
+    <div class="page-header">
+      <div class="breadcrumb">
+        <button class="btn-back" (click)="retourCours()">← Mes cours</button>
+        <span>/</span>
+        <button class="btn-bc" (click)="retourLecons()">{{ coursSelectionne?.titre }}</button>
+        <span>/</span>
+        <button class="btn-bc" (click)="retourQuiz()">{{ leconSelectionnee?.titre }}</button>
+        <span>/</span>
+        <span class="bc-current">{{ evalSelectionnee?.titre }}</span>
+      </div>
+      <div class="header-right">
+        <span class="total-points">Total : {{ totalPoints() }} pts</span>
+        <button class="btn-primary" (click)="openQuestionForm()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          Ajouter une question
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="questions.length === 0" class="empty-state">
+      <div class="empty-emoji">❓</div>
+      <h3>Aucune question</h3>
+      <p>Ajoutez des questions à ce quiz.</p>
+    </div>
+
+    <div class="questions-list" *ngIf="questions.length > 0">
+      <div *ngFor="let q of questions; let i = index" class="question-card" [style.--delay]="i * 55 + 'ms'">
+        <div class="q-header">
+          <div class="q-num">Q{{ i + 1 }}</div>
+          <div class="q-enonce">{{ q.enonce }}</div>
+          <div class="q-points">{{ q.point }} pt(s)</div>
+          <div class="q-actions">
+            <button class="icon-btn edit" (click)="openQuestionForm(q)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="icon-btn del" (click)="confirmerSupprimer('question', q.id, q.enonce)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M4 7H20M10 11V16M14 11V16M5 7L6 19a2 2 0 002 2h8a2 2 0 002-2L19 7M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="choix-list">
+          <div *ngFor="let c of q.choix" class="choix-item" [class.correct]="c.estCorrect">
+            <span class="choix-dot" [class.correct]="c.estCorrect">{{ c.estCorrect ? '✓' : '○' }}</span>
+            {{ c.texte }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══ MODAL LEÇON ══ -->
+  <div *ngIf="showLeconForm" class="overlay" (click)="showLeconForm = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ leconToEdit ? 'Modifier la leçon' : 'Nouvelle leçon' }}</h3>
+        <button class="close-btn" (click)="showLeconForm = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field"><label>Titre *</label><input type="text" [(ngModel)]="leconForm.titre" placeholder="Titre de la leçon"/></div>
+        <div class="field"><label>Description</label><textarea [(ngModel)]="leconForm.description" rows="3" placeholder="Description optionnelle…"></textarea></div>
+        <div class="field"><label>Ordre</label><input type="number" [(ngModel)]="leconForm.ordre" min="1"/></div>
+
+        <!-- Vidéo de la leçon -->
+        <div class="field">
+          <label>🎬 URL Vidéo (YouTube)</label>
+          <input type="url" [(ngModel)]="leconForm.videoUrl"
+            placeholder="https://www.youtube.com/watch?v=…"/>
+          <span class="field-hint">Collez l'URL YouTube de la leçon</span>
+        </div>
+
+        <!-- PDF de la leçon -->
+        <div class="field">
+          <label>📄 PDF / Slides (optionnel)</label>
+          <div class="pdf-upload-zone" (click)="pdfLeconInput.click()" [class.has-file]="leconForm.pdfUrl">
+            <input #pdfLeconInput type="file" accept=".pdf" style="display:none"
+              (change)="onLeconPdfChange($event)"/>
+            <div *ngIf="!leconForm.pdfUrl && !leconPdfUploading" class="pdf-placeholder">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="12" y1="18" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <polyline points="9 15 12 12 15 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <span>Cliquez pour uploader un PDF</span>
+            </div>
+            <div *ngIf="leconPdfUploading" class="pdf-uploading">
+              <div class="spinner-sm"></div><span>Upload…</span>
+            </div>
+            <div *ngIf="leconForm.pdfUrl && !leconPdfUploading" class="pdf-ready">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#ef4444" stroke-width="1.8"/>
+                <polyline points="14 2 14 8 20 8" stroke="#ef4444" stroke-width="1.8"/>
+              </svg>
+              <span>{{ leconPdfNomFichier || 'PDF existant' }}</span>
+              <button class="pdf-remove" (click)="removeLeconPdf(); $event.stopPropagation()">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="leconError" class="inline-error">⚠️ {{ leconError }}</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="showLeconForm = false">Annuler</button>
+        <button class="btn-submit" (click)="sauvegarderLecon()" [disabled]="leconLoading || leconPdfUploading">
+          <span class="btn-spinner" *ngIf="leconLoading"></span>
+          {{ leconLoading ? 'Sauvegarde…' : 'Sauvegarder' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL ÉVALUATION ══ -->
+  <div *ngIf="showEvalForm" class="overlay" (click)="showEvalForm = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ evalToEdit ? 'Modifier le quiz' : 'Nouveau quiz' }}</h3>
+        <button class="close-btn" (click)="showEvalForm = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field"><label>Titre *</label><input type="text" [(ngModel)]="evalForm.titre" placeholder="Ex: Quiz chapitre 1"/></div>
+        <div class="field">
+          <label>Type</label>
+          <select [(ngModel)]="evalForm.type">
+            <option value="QUIZ">📝 Quiz</option>
+            <option value="EXAMEN">📋 Examen</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Note max</label><input type="number" [(ngModel)]="evalForm.noteMax" min="1"/></div>
+          <div class="field"><label>Note min (réussite)</label><input type="number" [(ngModel)]="evalForm.noteMin" min="1"/></div>
+        </div>
+        <div *ngIf="evalError" class="inline-error">⚠️ {{ evalError }}</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="showEvalForm = false">Annuler</button>
+        <button class="btn-submit" (click)="sauvegarderEval()" [disabled]="evalLoading">
+          <span class="btn-spinner" *ngIf="evalLoading"></span>
+          {{ evalLoading ? 'Sauvegarde…' : 'Sauvegarder' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL QUESTION ══ -->
+  <div *ngIf="showQuestionForm" class="overlay" (click)="showQuestionForm = false">
+    <div class="modal modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ questionToEdit ? 'Modifier la question' : 'Nouvelle question' }}</h3>
+        <button class="close-btn" (click)="showQuestionForm = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Énoncé *</label>
+          <textarea [(ngModel)]="questionForm.enonce" rows="3" placeholder="Écrivez la question…"></textarea>
+        </div>
+        <div class="field">
+          <label>Points</label>
+          <input type="number" [(ngModel)]="questionForm.point" min="1" max="10"/>
+        </div>
+
+        <div class="choix-editor">
+          <div class="choix-editor-header">
+            <label>Choix de réponses</label>
+            <button class="btn-add-choix" (click)="ajouterChoix()">+ Ajouter un choix</button>
+          </div>
+          <div *ngFor="let c of choixTemp; let ci = index" class="choix-row">
+            <button class="choix-correct-btn" [class.correct]="c.estCorrect" (click)="definirCorrect(ci)" title="Marquer comme correct">
+              {{ c.estCorrect ? '✓' : '○' }}
+            </button>
+            <input type="text" [(ngModel)]="c.texte" placeholder="Texte du choix {{ ci + 1 }}…" class="choix-input"/>
+            <button class="choix-del-btn" (click)="supprimerChoix(ci)" [disabled]="choixTemp.length <= 2" title="Supprimer">✕</button>
+          </div>
+          <p class="choix-hint">💡 Cliquez sur ○ pour marquer le bon choix</p>
+        </div>
+
+        <div *ngIf="questionError" class="inline-error">⚠️ {{ questionError }}</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="showQuestionForm = false">Annuler</button>
+        <button class="btn-submit" (click)="sauvegarderQuestion()" [disabled]="questionLoading">
+          <span class="btn-spinner" *ngIf="questionLoading"></span>
+          {{ questionLoading ? 'Sauvegarde…' : 'Sauvegarder' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL SUPPRESSION ══ -->
+  <div *ngIf="showDeleteConfirm" class="overlay" (click)="annulerSupprimer()">
+    <div class="modal modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-icon-big">🗑️</div>
+      <h3>Supprimer ?</h3>
+      <p>Vous allez supprimer <strong>{{ deleteTarget?.label }}</strong>. Cette action est irréversible.</p>
+      <div class="confirm-footer">
+        <button class="cf-cancel" (click)="annulerSupprimer()">Annuler</button>
+        <button class="cf-delete" (click)="execSupprimer()" [disabled]="deleteLoading">
+          <span class="btn-spinner" *ngIf="deleteLoading"></span>
+          🗑 Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
