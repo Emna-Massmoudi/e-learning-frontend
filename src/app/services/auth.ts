@@ -8,7 +8,7 @@ import { LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.mode
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8081/api/auth';
+  private apiUrl = 'https://elearning-backend-1-lb7k.onrender.com/api/auth';
 
   constructor(private http: HttpClient) {}
 

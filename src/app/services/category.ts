@@ -8,7 +8,7 @@ import { Categorie } from '../models/Categorie.model';
 })
 export class CategoryService {
 
-  private apiUrl = 'http://localhost:8081/api/categories';
+ private apiUrl = 'https://elearning-backend-1-lb7k.onrender.com/api/categories';
 
   constructor(private http: HttpClient) {}
 

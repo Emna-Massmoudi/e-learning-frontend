@@ -8,7 +8,7 @@ import { InscriptionRequest, InscriptionResponse,StatutInscription } from '../mo
 @Injectable({ providedIn: 'root' })
 export class InscriptionService {
 
-  private readonly baseUrl = 'http://localhost:8081/api/inscriptions';
+  private readonly baseUrl = 'https://elearning-backend-1-lb7k.onrender.com/api/inscriptions';
 
   constructor(private http: HttpClient) {}
 

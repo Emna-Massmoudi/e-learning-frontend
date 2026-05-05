@@ -9,7 +9,7 @@ import { EtudiantResponse } from '../models/etudiant.model';
 })
 export class AdminService {
 
-  private apiUrl = 'http://localhost:8081/api/admin';
+  private apiUrl = 'https://elearning-backend-1-lb7k.onrender.com/api/admin';
 
   constructor(private http: HttpClient) {}
 

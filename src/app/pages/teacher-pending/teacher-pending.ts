@@ -13,4 +13,8 @@ export class TeacherPending {
   goHome() {
     this.router.navigate(['/']);
   }
+  logout() {
+  localStorage.removeItem('token'); 
+  window.location.href = '/login';  
+}
 }

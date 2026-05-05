@@ -1,7 +1,6 @@
 <div class="pending-container">
   <div class="card">
 
-    <!-- Icône animée -->
     <div class="icon-wrapper">
       <div class="icon-bg">
         <div class="icon">⏳</div>
@@ -18,7 +17,6 @@
         Notre équipe va examiner votre dossier.
       </p>
 
-      <!-- Statut -->
       <div class="status">
         <span class="status-label">Statut :</span>
         <span class="badge">
@@ -27,7 +25,6 @@
         </span>
       </div>
 
-      <!-- Étapes de progression -->
       <div class="steps">
         <div class="step done">
           <div class="step-dot">✓</div>
@@ -47,7 +44,6 @@
         </div>
       </div>
 
-      <!-- Info -->
       <div class="info-card">
         <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"></circle>
@@ -60,7 +56,6 @@
         </p>
       </div>
 
-      <!-- Bouton -->
       <button class="home-button" (click)="goHome()">
         <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 9L12 3L21 9L12 15L3 9Z"></path>
@@ -68,6 +63,10 @@
           <path d="M9 18L12 15L15 18"></path>
         </svg>
         Retour à l'accueil
+      </button>
+
+      <button class="logout-button" (click)="logout()">
+        🔓 Se déconnecter
       </button>
 
     </div>

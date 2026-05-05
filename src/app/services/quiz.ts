@@ -13,10 +13,10 @@ import { ResultatQuiz } from '../models/resultat.model';
 @Injectable({ providedIn: 'root' })
 export class QuizService {
 
-  private readonly baseLecon = 'http://localhost:8081/api/lecons';
-  private readonly baseEval  = 'http://localhost:8081/api/evaluations';
-  private readonly baseQues  = 'http://localhost:8081/api/questions';
-  private readonly baseChoix = 'http://localhost:8081/api/choix';
+  private  baseLecon = 'https://elearning-backend-1-lb7k.onrender.com/api/lecons';
+private  baseEval  = 'https://elearning-backend-1-lb7k.onrender.com/api/evaluations';
+private  baseQues  = 'https://elearning-backend-1-lb7k.onrender.com/api/questions';
+private  baseChoix = 'https://elearning-backend-1-lb7k.onrender.com/api/choix';
 
   constructor(private http: HttpClient) {}
 
@@ -74,7 +74,7 @@ export class QuizService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<{ url: string; fileName: string }>(
-      'http://localhost:8081/api/upload/pdf',
+      'https://elearning-backend-1-lb7k.onrender.com/api/upload/pdf',
       formData,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );

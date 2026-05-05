@@ -8,7 +8,7 @@ import { SousCategorie } from '../models/sous-categorie.model';
 })
 export class SousCategorieService {
 
-  private apiUrl = 'http://localhost:8081/api/sous-categories';
+  private apiUrl = 'https://elearning-backend-1-lb7k.onrender.com/api/sous-categories';
 
   constructor(private http: HttpClient) {}
 
