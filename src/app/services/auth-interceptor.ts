@@ -1,11 +1,15 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError } from 'rxjs';
 
 /**
  * 🔐 Intercepteur d'authentification
  *
- * Rôle :
- * On utilise ce code pour envoyer le token de l’utilisateur connecté avec chaque requête,
- *  afin que le backend puisse identifier l’utilisateur et vérifier ses permissions (rôles et privilèges).
+ * 🎯 Rôle :
+ * - Ajouter automatiquement le token JWT dans chaque requête HTTP
+ * - Gérer les erreurs (ex: token expiré)
+ * - Rediriger l'utilisateur vers login si nécessaire
  */
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -13,18 +17,41 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // 🔑 Récupération du token depuis le localStorage
   const token = localStorage.getItem('token');
 
-  console.log("Interceptor ok, token:", token);
+  // 🚀 Injection du Router (nécessaire dans un interceptor fonctionnel)
+  const router = inject(Router);
 
-  // ✅ Si le token existe → ajouter Authorization header
+  // 🧾 Par défaut, on garde la requête originale
+  let clonedRequest = req;
+
+  // ✅ Si le token existe → on ajoute Authorization header
   if (token) {
-    const cloned = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${token}`)
+    clonedRequest = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}` // format standard JWT
+      }
     });
-
-    // 🔁 Envoi de la requête modifiée
-    return next(cloned);
   }
 
-  // ❌ Sinon → envoi de la requête originale
-  return next(req);
+  // 🔁 Envoi de la requête (modifiée ou non)
+  return next(clonedRequest).pipe(
+
+    // ⚠️ Intercepter les erreurs HTTP
+    catchError((error: HttpErrorResponse) => {
+
+      // ❌ Cas : token expiré ou invalide
+      if (error.status === 401) {
+
+        console.warn("🔒 Token expiré ou invalide");
+
+        // 🧹 Supprimer uniquement le token (éviter clear() global)
+        localStorage.removeItem('token');
+
+        // 🔄 Rediriger vers la page de connexion
+        router.navigate(['/login']);
+      }
+
+      // 🔁 Propager l'erreur pour ne pas bloquer l'application
+      throw error;
+    })
+  );
 };
