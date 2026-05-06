@@ -167,7 +167,7 @@
     <div *ngIf="!loading && !errorMessage && filteredCours().length > 0 && viewMode === 'grid'" class="cours-grid">
       <div *ngFor="let c of filteredCours(); let i = index" class="cours-card" [style.--delay]="i * 70 + 'ms'">
         <div class="card-banner" [style.background]="getBannerGradient(c.categorieId)">
-          <img *ngIf="c.imageUrl" [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'http://localhost:8081' + c.imageUrl"
+          <img *ngIf="c.imageUrl" [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'https://elearning-backend-0fmz.onrender.com' + c.imageUrl"
             class="card-banner-img" alt="{{ c.titre }}" (error)="$any($event.target).style.display='none'"/>
           <div class="card-emoji" [class.hidden]="c.imageUrl">{{ getIcon(c.categorieNom) }}</div>
           <div class="card-actions">

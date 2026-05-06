@@ -37,7 +37,7 @@ export class AdminFormateurs implements OnInit {
   confirmDebloquerTarget: FormateurResponse | null = null;
   confirmDebloquerLoading = false;
 
-  private readonly baseUrl = 'http://localhost:8081/api';
+  private readonly baseUrl = 'https://elearning-backend-0fmz.onrender.com/api';
 
   constructor(
     private readonly formateurService: FormateurService,
@@ -182,7 +182,7 @@ export class AdminFormateurs implements OnInit {
 
   getFileUrl(path: string | null | undefined): string {
     if (!path) return '#';
-    return `http://localhost:8081${path}`;
+    return `https://elearning-backend-0fmz.onrender.com${path}`;
   }
 
   getInitiales(nom: string): string {

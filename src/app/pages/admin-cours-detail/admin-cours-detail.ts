@@ -143,7 +143,7 @@ export class AdminCoursDetail implements OnInit {
   }
 
   getFileUrl(path: string): string {
-    return `http://localhost:8081${path}`;
+    return `https://elearning-backend-0fmz.onrender.com${path}`;
   }
 
   isYoutube(url: string): boolean {

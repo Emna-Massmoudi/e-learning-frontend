@@ -23,7 +23,7 @@
            (click)="selectionnerCours(c)">
         <div class="card-banner" [style.background]="getBannerGradient(c.categorieId)">
           <img *ngIf="c.imageUrl"
-            [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'http://localhost:8081' + c.imageUrl"
+            [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'https://elearning-backend-0fmz.onrender.com' + c.imageUrl"
             class="card-img" (error)="$any($event.target).style.display='none'"/>
           <span *ngIf="!c.imageUrl" class="card-emoji">{{ getIcon(c.categorieNom) }}</span>
         </div>

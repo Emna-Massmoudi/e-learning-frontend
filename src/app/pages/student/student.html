@@ -260,7 +260,7 @@
                class="course-card" [style.--i]="i">
             <div class="course-thumb" [style.background]="getBannerGradient(c.categorieId)">
               <img *ngIf="c.imageUrl"
-                [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'http://localhost:8081' + c.imageUrl"
+                [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'https://elearning-backend-0fmz.onrender.com' + c.imageUrl"
                 (error)="$any($event.target).style.display='none'" class="thumb-img"/>
               <div class="thumb-icon" [class.hidden]="c.imageUrl">{{ getIcon(c.categorieNom) }}</div>
               <div class="thumb-overlay">

@@ -128,7 +128,7 @@ export class TeacherProfile implements OnInit {
 
   getFileUrl(path: string | null | undefined): string {
     if (!path) return '#';
-    return `http://localhost:8081${path}`;
+    return `https://elearning-backend-0fmz.onrender.com${path}`;
   }
 
   retourDashboard(): void {

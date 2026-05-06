@@ -9,7 +9,7 @@ import { FormateurResponse } from '../models/formateur.model';
   providedIn: 'root',
 })
 export class FormateurService {
-  private apiUrl = 'https://elearning-backend-1-lb7k.onrender.com/api/formateurs';
+  private apiUrl = 'https://elearning-backend-0fmz.onrender.com/api/formateurs';
 
   constructor(private http: HttpClient) {}
 

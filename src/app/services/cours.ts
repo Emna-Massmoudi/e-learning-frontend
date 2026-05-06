@@ -12,7 +12,7 @@ export interface UploadResponse {
 @Injectable({ providedIn: 'root' })
 export class CoursService {
 
-  private readonly baseUrl = 'https://elearning-backend-1-lb7k.onrender.com/api/cours';
+  private readonly baseUrl = 'https://elearning-backend-0fmz.onrender.com/api/cours';
 
   constructor(private http: HttpClient) {}
 
@@ -43,7 +43,7 @@ export class CoursService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<UploadResponse>(
-  'https://elearning-backend-1-lb7k.onrender.com/api/upload/pdf',
+  'https://elearning-backend-0fmz.onrender.com/api/upload/pdf',
   formData
 );
   }

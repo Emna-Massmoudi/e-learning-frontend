@@ -178,7 +178,7 @@ export class Student implements OnInit {
   // ── PDF ───────────────────────────────────────────────
 
   getPdfUrl(url: string): SafeResourceUrl {
-    const fullUrl = url.startsWith('http') ? url : `http://localhost:8081${url}`;
+    const fullUrl = url.startsWith('http') ? url : `https://elearning-backend-0fmz.onrender.com${url}`;
     return this.sanitizer.bypassSecurityTrustResourceUrl(fullUrl);
   }
 

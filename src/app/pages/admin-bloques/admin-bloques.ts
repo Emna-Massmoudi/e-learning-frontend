@@ -37,7 +37,7 @@ export class AdminBloques implements OnInit {
   confirmAction: 'debloquer' | '' = '';
   confirmLoading = false;
 
-  private readonly base = 'http://localhost:8081/api/admin';
+  private readonly base = 'https://elearning-backend-0fmz.onrender.com/api/admin';
 
   constructor(
     private readonly http: HttpClient,
