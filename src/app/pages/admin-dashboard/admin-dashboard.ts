@@ -204,65 +204,67 @@ export class AdminDashboard implements OnInit, AfterViewInit {
     });
   }
 
-  // ── Line chart : évolution des cours dans le temps ────────────────────
-  dessinerLineChart(): void {
-    const canvas = this.chartLineRef?.nativeElement;
-    if (!canvas) return;
+ dessinerLineChart(): void {
+  const canvas = this.chartLineRef?.nativeElement;
+  if (!canvas) return;
 
-    if (this.lineChart) { this.lineChart.destroy(); this.lineChart = undefined; }
-
-    // Grouper les cours par mois de création (si dateCreation existe)
-    // Sinon on utilise des données d'exemple progressives
-    const moisLabels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
-                        'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
-    const currentMonth = new Date().getMonth(); // 0-based
-    const last6Labels  = moisLabels.slice(Math.max(0, currentMonth - 5), currentMonth + 1);
-
-    // Tentative de groupement réel par mois
-    const countsParMois: Record<string, number> = {};
-    last6Labels.forEach(m => countsParMois[m] = 0);
-
-    this.allCours.forEach(c => {
-      if ((c as any).dateCreation) {
-        const d = new Date((c as any).dateCreation);
-        const label = moisLabels[d.getMonth()];
-        if (label in countsParMois) countsParMois[label]++;
-      }
-    });
-
-    // Si aucune date disponible → courbe progressive pour la démo
-    const dataPoints = Object.values(countsParMois);
-    const hasRealData = dataPoints.some(v => v > 0);
-    const finalData = hasRealData ? dataPoints : [2, 5, 8, 12, 18, 22].slice(0, last6Labels.length);
-
-    this.lineChart = new Chart(canvas, {
-      type: 'line',
-      data: {
-        labels: last6Labels,
-        datasets: [{
-          label: 'Cours créés',
-          data:  finalData,
-          borderColor:     '#6366f1',
-          backgroundColor: 'rgba(99,102,241,.1)',
-          fill:            true,
-          tension:         0.4,
-          pointRadius:     5,
-          pointBackgroundColor: '#6366f1',
-          pointBorderColor:     '#ffffff',
-          pointBorderWidth:     2,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 800 },
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { stepSize: 1 } }
-        }
-      }
-    });
+  if (this.lineChart) {
+    this.lineChart.destroy();
+    this.lineChart = undefined;
   }
+
+  const moisLabels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
+                      'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+
+  const currentMonth = new Date().getMonth();
+  const last6Labels  = moisLabels.slice(Math.max(0, currentMonth - 5), currentMonth + 1);
+
+  const countsParMois: Record<string, number> = {};
+  last6Labels.forEach(m => countsParMois[m] = 0);
+
+  // ✅ Utilisation STRICTE des données backend
+  this.allCours.forEach(c => {
+    if ((c as any).dateCreation) {
+      const d = new Date((c as any).dateCreation);
+      const label = moisLabels[d.getMonth()];
+      if (label in countsParMois) {
+        countsParMois[label]++;
+      }
+    }
+  });
+
+  const finalData = Object.values(countsParMois);
+
+  // ❗ Si aucune donnée → afficher message 
+  if (finalData.every(v => v === 0)) {
+    console.warn("Aucune donnée réelle pour le graphique");
+    return;
+  }
+
+  this.lineChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: last6Labels,
+      datasets: [{
+        label: 'Cours créés',
+        data: finalData,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 5,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+      }
+    }
+  });
+}
 
   // ── Helpers ───────────────────────────────────────────────────────────
   getStatutLabel(statut: EtatCours): string {

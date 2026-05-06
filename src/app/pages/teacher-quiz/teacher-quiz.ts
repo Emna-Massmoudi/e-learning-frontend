@@ -85,16 +85,17 @@ export class TeacherQuiz implements OnInit {
   // ── Chargement ────────────────────────────────────────
 
   chargerMesCours(): void {
-    this.loading = true;
-    this.coursService.getCoursByFormateur(this.formateurId).subscribe({
-      next: (data: Cours[]) => {
-        this.mesCours = data;
-        this.loading  = false;
-        this.cdr.detectChanges();
-      },
-      error: (err: unknown) => { console.error(err); this.loading = false; this.cdr.detectChanges(); }
-    });
-  }
+  this.loading = true;
+  this.coursService.getCoursByFormateur(this.formateurId).subscribe({
+    next: (data: Cours[]) => {
+      // ✅ Afficher seulement les cours publiés
+      this.mesCours = data.filter(c => c.etatPublication === 'PUBLIE');
+      this.loading  = false;
+      this.cdr.detectChanges();
+    },
+    error: (err: unknown) => { console.error(err); this.loading = false; this.cdr.detectChanges(); }
+  });
+}
 
   selectionnerCours(cours: Cours): void {
     this.coursSelectionne = cours;

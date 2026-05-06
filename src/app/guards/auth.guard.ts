@@ -6,7 +6,7 @@ type Role = 'ADMIN' | 'ETUDIANT' | 'FORMATEUR';
 interface JwtPayload {
   exp?: number;
 }
-
+//pour  decoder le token et vérifier son expiration
 function getTokenPayload(token: string): JwtPayload | null {
   try {
     const payload = token.split('.')[1];

@@ -1,57 +1,51 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { Injectable } from '@angular/core';
+import {
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+  HttpErrorResponse
+} from '@angular/common/http';
+import { Observable, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { catchError } from 'rxjs';
 
-/**
- * 🔐 Intercepteur d'authentification
- *
- * 🎯 Rôle :
- * - Ajouter automatiquement le token JWT dans chaque requête HTTP
- * - Gérer les erreurs (ex: token expiré)
- * - Rediriger l'utilisateur vers login si nécessaire
- */
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  // Routes publiques → pas de token
+  private readonly PUBLIC_ROUTES = [
+    '/api/auth/',
+    '/api/categories',
+    '/api/cours'
+  ];
 
-  // 🔑 Récupération du token depuis le localStorage
-  const token = localStorage.getItem('token');
+  constructor(private router: Router) {}
 
-  // 🚀 Injection du Router (nécessaire dans un interceptor fonctionnel)
-  const router = inject(Router);
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-  // 🧾 Par défaut, on garde la requête originale
-  let clonedRequest = req;
+    const isPublic = this.PUBLIC_ROUTES.some(route => req.url.includes(route));
+    const token = localStorage.getItem('token');
 
-  // ✅ Si le token existe → on ajoute Authorization header
-  if (token) {
-    clonedRequest = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}` // format standard JWT
-      }
-    });
+    let clonedRequest = req;
+
+    if (token && !isPublic) {
+      clonedRequest = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
+
+    return next.handle(clonedRequest).pipe(
+      catchError((error: HttpErrorResponse) => {
+
+        if (error.status === 401) {
+          localStorage.removeItem('token');
+          this.router.navigate(['/login']);
+        }
+
+        return throwError(() => error);
+      })
+    );
   }
-
-  // 🔁 Envoi de la requête (modifiée ou non)
-  return next(clonedRequest).pipe(
-
-    // ⚠️ Intercepter les erreurs HTTP
-    catchError((error: HttpErrorResponse) => {
-
-      // ❌ Cas : token expiré ou invalide
-      if (error.status === 401) {
-
-        console.warn("🔒 Token expiré ou invalide");
-
-        // 🧹 Supprimer uniquement le token (éviter clear() global)
-        localStorage.removeItem('token');
-
-        // 🔄 Rediriger vers la page de connexion
-        router.navigate(['/login']);
-      }
-
-      // 🔁 Propager l'erreur pour ne pas bloquer l'application
-      throw error;
-    })
-  );
-};
+}

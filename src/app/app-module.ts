@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
-import { authInterceptor } from './services/auth-interceptor';
+import { AuthInterceptor } from './services/auth-interceptor';
 
 // ── Non-standalone → declarations ─────────────────────
 import { Login }             from './pages/login/login';
@@ -37,13 +37,15 @@ import { TeacherQuiz }      from './pages/teacher-quiz/teacher-quiz';
     Register,
     Teacher,
     TeacherApplication,
-    TeacherProfile,   // standalone: false ✓
+    TeacherProfile,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     CommonModule,
+    HttpClientModule, // 🔥 IMPORTANT
+
     // Standalone components
     Student,
     Admin,
@@ -57,10 +59,14 @@ import { TeacherQuiz }      from './pages/teacher-quiz/teacher-quiz';
     AdminEtudiants,
     AdminCoursDetail,
     Home,
-    TeacherQuiz,      
+    TeacherQuiz,
   ],
   providers: [
-    provideHttpClient(withInterceptors([authInterceptor]), withFetch())
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [App],
 })
